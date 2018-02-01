@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="item"
+            type="me.gavin.app.message.Message" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingEnd="@dimen/activity_horizontal_margin"
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        tools:paddingBottom="100dp">
+
+        <TextView
+            android:id="@+id/tvTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="12:18"
+            tools:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/ivLAvatar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:src="@color/colorAccent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvTime"
+            app:layout_goneMarginTop="8dp"
+            tools:ignore="contentDescription" />
+
+        <TextView
+            android:id="@+id/tvLText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="@color/colorAccent"
+            android:padding="8dp"
+            android:text="@{item.content}"
+            android:textColor="@android:color/white"
+            android:visibility="@{ivLAvatar.getVisibility()}"
+            app:layout_constraintStart_toEndOf="@+id/ivLAvatar"
+            app:layout_constraintTop_toTopOf="@+id/ivLAvatar"
+            tools:text="随风潜入夜，润物细无声" />
+
+        <ImageView
+            android:id="@+id/ivRAvatar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:src="@color/colorAccent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvTime"
+            app:layout_goneMarginTop="8dp"
+            tools:ignore="contentDescription"
+            tools:layout_marginTop="100dp" />
+
+        <TextView
+            android:id="@+id/tvLeftText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:background="@color/colorAccent"
+            android:padding="8dp"
+            android:text="@{item.content}"
+            android:textColor="@android:color/white"
+            android:visibility="@{ivRAvatar.getVisibility()}"
+            app:layout_constraintEnd_toStartOf="@+id/ivRAvatar"
+            app:layout_constraintTop_toTopOf="@+id/ivRAvatar"
+            tools:text="随风潜入夜，润物细无声" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</layout>
