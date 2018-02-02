@@ -15,16 +15,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:paddingBottom="8dp"
         android:paddingEnd="@dimen/activity_horizontal_margin"
         android:paddingStart="@dimen/activity_horizontal_margin"
-        tools:paddingBottom="100dp">
+        android:paddingTop="8dp">
 
         <TextView
             android:id="@+id/tvTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -50,7 +50,6 @@
             android:layout_marginStart="8dp"
             android:background="@color/colorAccent"
             android:padding="8dp"
-            android:text="@{item.content}"
             android:textColor="@android:color/white"
             android:visibility="@{ivLAvatar.getVisibility()}"
             app:layout_constraintStart_toEndOf="@+id/ivLAvatar"
@@ -67,16 +66,15 @@
             app:layout_constraintTop_toBottomOf="@+id/tvTime"
             app:layout_goneMarginTop="8dp"
             tools:ignore="contentDescription"
-            tools:layout_marginTop="100dp" />
+            tools:layout_marginTop="80dp" />
 
         <TextView
-            android:id="@+id/tvLeftText"
+            android:id="@+id/tvRText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:background="@color/colorAccent"
             android:padding="8dp"
-            android:text="@{item.content}"
             android:textColor="@android:color/white"
             android:visibility="@{ivRAvatar.getVisibility()}"
             app:layout_constraintEnd_toStartOf="@+id/ivRAvatar"

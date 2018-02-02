@@ -13,7 +13,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:popupTheme="@style/AppTheme.PopupOverlay"
-            app:theme="@style/ToolbarLightOverflow" />
+            app:theme="@style/ToolbarLightOverflow"
+            app:title="@string/app_name" />
 
     </android.support.design.widget.AppBarLayout>
 

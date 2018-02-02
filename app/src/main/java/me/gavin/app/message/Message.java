@@ -15,6 +15,7 @@ public class Message {
     private String url;
     private int type;
     private int state;
+    private long time;
 
     public String getId() {
         return id;
@@ -78,5 +79,13 @@ public class Message {
 
     public void setState(int state) {
         this.state = state;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
     }
 }

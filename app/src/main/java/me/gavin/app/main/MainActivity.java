@@ -46,13 +46,13 @@ public class MainActivity extends BindingActivity<ActMainBinding>
         }
 
         subscribeEvent();
-        binding.navigation.setNavigationItemSelectedListener(this);
-        binding.navigation.getMenu().findItem(R.id.nav_news).setChecked(true);
+        mBinding.navigation.setNavigationItemSelectedListener(this);
+        mBinding.navigation.getMenu().findItem(R.id.nav_news).setChecked(true);
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        binding.drawer.closeDrawer(Gravity.START);
+        mBinding.drawer.closeDrawer(Gravity.START);
         if (item.isChecked()) return true;
         switch (item.getItemId()) {
             case R.id.nav_news:
@@ -78,8 +78,8 @@ public class MainActivity extends BindingActivity<ActMainBinding>
 
     @Override
     public void onBackPressedSupport() {
-        if (binding.drawer.isDrawerOpen(Gravity.START)) {
-            binding.drawer.closeDrawer(Gravity.START);
+        if (mBinding.drawer.isDrawerOpen(Gravity.START)) {
+            mBinding.drawer.closeDrawer(Gravity.START);
         } else {
             super.onBackPressedSupport();
         }
@@ -114,16 +114,16 @@ public class MainActivity extends BindingActivity<ActMainBinding>
                 .doOnSubscribe(mCompositeDisposable::add)
                 .subscribe(event -> {
                     if (event.open) {
-                        binding.drawer.openDrawer(Gravity.START);
+                        mBinding.drawer.openDrawer(Gravity.START);
                     } else {
-                        binding.drawer.closeDrawer(Gravity.START);
+                        mBinding.drawer.closeDrawer(Gravity.START);
                     }
                 });
 
         RxBus.get().toObservable(DrawerEnableEvent.class)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(mCompositeDisposable::add)
-                .subscribe(event -> binding.drawer.setDrawerLockMode(event.enable
+                .subscribe(event -> mBinding.drawer.setDrawerLockMode(event.enable
                         ? DrawerLayout.LOCK_MODE_UNLOCKED
                         : DrawerLayout.LOCK_MODE_LOCKED_CLOSED));
     }
