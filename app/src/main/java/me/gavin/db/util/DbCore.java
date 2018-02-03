@@ -2,6 +2,7 @@ package me.gavin.db.util;
 
 import android.content.Context;
 
+import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.query.QueryBuilder;
 
 import me.gavin.db.dao.DaoMaster;
@@ -24,10 +25,7 @@ public class DbCore {
         init(context, DEFAULT_DB_NAME);
     }
 
-    public static void init(Context context, String dbName) {
-        if (context == null) {
-            throw new IllegalArgumentException("context can't be null");
-        }
+    public static void init(@NotNull Context context, String dbName) {
         DB_NAME = dbName;
         enableQueryBuilderLog();
     }

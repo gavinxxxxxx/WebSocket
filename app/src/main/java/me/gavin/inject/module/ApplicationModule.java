@@ -12,7 +12,12 @@ import dagger.Provides;
  *
  * @author gavin.xiong 2017/4/28
  */
-@Module(includes = {DataLayerModule.class, ClientAPIModule.class, CompositeDisposableModule.class})
+@Module(includes = {
+        DataLayerModule.class,
+        DatabaseModule.class,
+        ClientAPIModule.class,
+        CompositeDisposableModule.class
+})
 public class ApplicationModule {
 
     private Application mApplication;

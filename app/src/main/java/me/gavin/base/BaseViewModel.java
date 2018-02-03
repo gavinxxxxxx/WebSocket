@@ -10,6 +10,7 @@ import java.lang.ref.WeakReference;
 
 import javax.inject.Inject;
 
+import me.gavin.db.dao.DaoSession;
 import me.gavin.inject.component.ApplicationComponent;
 import me.gavin.service.base.DataLayer;
 import io.reactivex.disposables.CompositeDisposable;
@@ -24,6 +25,8 @@ public abstract class BaseViewModel extends BaseObservable implements Disposable
 
     @Inject
     DataLayer mDataLayer;
+    @Inject
+    DaoSession mDaoSession;
     @Inject
     protected CompositeDisposable mCompositeDisposable;
 
