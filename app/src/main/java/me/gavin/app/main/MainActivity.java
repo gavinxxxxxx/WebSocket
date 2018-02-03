@@ -15,15 +15,11 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import me.gavin.app.collection.CollectionFragment;
-import me.gavin.app.daily.DailyFragment;
-import me.gavin.app.gank.GankFragment;
 import me.gavin.app.setting.AboutFragment;
 import me.gavin.base.BindingActivity;
 import me.gavin.base.RxBus;
 import me.gavin.im.ws.R;
 import me.gavin.im.ws.databinding.ActMainBinding;
-import me.gavin.test.TestFragment;
 import me.yokeyword.fragmentation.SupportFragment;
 
 public class MainActivity extends BindingActivity<ActMainBinding>
@@ -42,7 +38,7 @@ public class MainActivity extends BindingActivity<ActMainBinding>
                     View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
         if (savedInstanceState == null) {
-            loadRootFragment(R.id.holder, TestFragment.newInstance());
+            loadRootFragment(R.id.holder, MainFragment.newInstance());
         }
 
         subscribeEvent();
@@ -56,13 +52,10 @@ public class MainActivity extends BindingActivity<ActMainBinding>
         if (item.isChecked()) return true;
         switch (item.getItemId()) {
             case R.id.nav_news:
-                popTo();
                 break;
             case R.id.nav_gank:
-                next(GankFragment.newInstance());
                 break;
             case R.id.nav_collection:
-                next(CollectionFragment.newInstance());
                 break;
             case R.id.nav_about:
                 next(AboutFragment.newInstance());
@@ -83,15 +76,6 @@ public class MainActivity extends BindingActivity<ActMainBinding>
         } else {
             super.onBackPressedSupport();
         }
-    }
-
-    private void popTo() {
-        Observable.just(0)
-                .delay(380, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(mCompositeDisposable::add)
-                .subscribe(arg0 -> popTo(DailyFragment.class, false));
     }
 
     private void next(SupportFragment fragment) {
