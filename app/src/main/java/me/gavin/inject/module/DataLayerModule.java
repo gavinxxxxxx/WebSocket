@@ -4,6 +4,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import me.gavin.service.MessageManager;
 import me.gavin.service.SettingManager;
 import me.gavin.service.base.DataLayer;
 
@@ -17,13 +18,19 @@ public class DataLayerModule {
 
     @Singleton
     @Provides
-    public SettingManager provideSettingManager() {
+    MessageManager provideMessageManager() {
+        return new MessageManager();
+    }
+
+    @Singleton
+    @Provides
+    SettingManager provideSettingManager() {
         return new SettingManager();
     }
 
     @Singleton
     @Provides
-    public DataLayer provideDataLayer(SettingManager settingManager) {
-        return new DataLayer(settingManager);
+    DataLayer provideDataLayer(MessageManager messageManager, SettingManager settingManager) {
+        return new DataLayer(messageManager, settingManager);
     }
 }

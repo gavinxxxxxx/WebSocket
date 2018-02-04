@@ -2,10 +2,13 @@ package me.gavin.inject.module;
 
 import android.app.Application;
 
+import org.greenrobot.greendao.query.QueryBuilder;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import me.gavin.base.Config;
 import me.gavin.db.dao.DaoMaster;
 import me.gavin.db.dao.DaoSession;
 import me.gavin.util.L;
@@ -20,15 +23,17 @@ public class DatabaseModule {
 
     @Singleton
     @Provides
-    public DaoMaster provideDaoMaster(Application application) {
+    DaoMaster provideDaoMaster(Application application) {
         L.e("provideDaoMaster");
-        DaoMaster.DevOpenHelper devOpenHelper = new DaoMaster.DevOpenHelper(application, "dbname", null);
+        QueryBuilder.LOG_SQL = true;
+        QueryBuilder.LOG_VALUES = true;
+        DaoMaster.DevOpenHelper devOpenHelper = new DaoMaster.DevOpenHelper(application, Config.DB_NAME);
         return new DaoMaster(devOpenHelper.getWritableDatabase());
     }
 
     @Singleton
     @Provides
-    public DaoSession provideDaoSession(DaoMaster daoMaster) {
+    DaoSession provideDaoSession(DaoMaster daoMaster) {
         L.e("provideDaoSession");
         return daoMaster.newSession();
     }
