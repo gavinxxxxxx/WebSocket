@@ -1,12 +1,17 @@
 package me.gavin.base;
 
 import android.databinding.BindingAdapter;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Space;
 
 import me.gavin.im.ws.R;
+import me.gavin.util.DisplayUtil;
 import me.gavin.util.ImageLoader;
 
 /**
@@ -54,6 +59,30 @@ public class BindingAdapters {
     public static void showMsg(View view, String msg) {
         if (!TextUtils.isEmpty(msg)) {
             Snackbar.make(view, msg, Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    @BindingAdapter({"statusBarCoverExAnchor"})
+    public static void statusBarCoverExAnchor(CoordinatorLayout coordinatorLayout, View anchor) {
+        if (coordinatorLayout.findViewWithTag("statusBarCoverExCover") == null) {
+            final Space space = new Space(coordinatorLayout.getContext());
+            space.setFitsSystemWindows(false);
+            coordinatorLayout.addView(space);
+
+            final View cover = new View(coordinatorLayout.getContext());
+            CoordinatorLayout.LayoutParams layoutParams = new CoordinatorLayout
+                    .LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT, DisplayUtil.getStatusHeight());
+            cover.setLayoutParams(layoutParams);
+            ViewCompat.setElevation(cover, ViewCompat.getElevation(anchor));
+            cover.setBackgroundColor(ContextCompat.getColor(coordinatorLayout.getContext(), R.color.colorPrimaryDark));
+            cover.setFitsSystemWindows(true);
+            cover.setTag("statusBarCoverExCover");
+            coordinatorLayout.addView(cover);
+
+            coordinatorLayout.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
+                cover.setVisibility(space.getTop() > 0 ? View.VISIBLE : View.GONE);
+                ViewCompat.setElevation(cover, ViewCompat.getElevation(anchor));
+            });
         }
     }
 

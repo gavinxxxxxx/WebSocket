@@ -8,8 +8,10 @@ import android.view.ViewGroup;
 
 import javax.inject.Inject;
 
-import me.gavin.inject.component.ApplicationComponent;
+import dagger.Lazy;
 import io.reactivex.disposables.CompositeDisposable;
+import me.gavin.inject.component.ApplicationComponent;
+import me.gavin.service.base.DataLayer;
 import me.yokeyword.fragmentation.SupportFragment;
 
 /**
@@ -19,6 +21,8 @@ import me.yokeyword.fragmentation.SupportFragment;
  */
 public abstract class BaseFragment extends SupportFragment {
 
+    @Inject
+    Lazy<DataLayer> mDataLayer;
     @Inject
     protected CompositeDisposable mCompositeDisposable;
 
@@ -38,6 +42,10 @@ public abstract class BaseFragment extends SupportFragment {
     public void onDestroyView() {
         super.onDestroyView();
         mCompositeDisposable.dispose();
+    }
+
+    public DataLayer getDataLayer() {
+        return mDataLayer.get();
     }
 
     /**

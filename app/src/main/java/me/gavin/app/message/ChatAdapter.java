@@ -16,9 +16,9 @@ import me.gavin.im.ws.databinding.ItemMessageBinding;
  *
  * @author gavin.xiong 2018/2/2
  */
-public class MessageAdapter extends RecyclerAdapter<Message, ItemMessageBinding> {
+public class ChatAdapter extends RecyclerAdapter<Message, ItemMessageBinding> {
 
-    public MessageAdapter(Context context, @NonNull List<Message> list) {
+    public ChatAdapter(Context context, @NonNull List<Message> list) {
         super(context, list, R.layout.item_message);
     }
 

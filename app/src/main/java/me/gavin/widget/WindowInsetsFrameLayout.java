@@ -12,7 +12,7 @@ import android.widget.FrameLayout;
  * Useful for Fragment containers.
  *
  * @author Pkmmte Xeleon
- * @author https://gist.github.com/Pkmmte/d8e983fb9772d2c91688
+ * @author {https://gist.github.com/Pkmmte/d8e983fb9772d2c91688}
  * @link {http://stackoverflow.com/questions/31190612/fitssystemwindows-effect-gone-for-fragments-added-via-fragmenttransaction}
  */
 public class WindowInsetsFrameLayout extends FrameLayout {
@@ -24,9 +24,9 @@ public class WindowInsetsFrameLayout extends FrameLayout {
     @TargetApi(Build.VERSION_CODES.KITKAT_WATCH)
     @Override
     public WindowInsets onApplyWindowInsets(WindowInsets insets) {
-        int childCount = getChildCount();
-        for (int index = 0; index < childCount; index++)
-            getChildAt(index).dispatchApplyWindowInsets(insets);
+        for (int i = 0; i < getChildCount(); i++) {
+            getChildAt(i).dispatchApplyWindowInsets(insets);
+        }
         return insets;
     }
 }

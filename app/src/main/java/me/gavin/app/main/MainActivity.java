@@ -15,19 +15,18 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import me.gavin.app.setting.AboutFragment;
 import me.gavin.base.BindingActivity;
 import me.gavin.base.RxBus;
 import me.gavin.im.ws.R;
-import me.gavin.im.ws.databinding.ActMainBinding;
+import me.gavin.im.ws.databinding.ActivityMainBinding;
 import me.yokeyword.fragmentation.SupportFragment;
 
-public class MainActivity extends BindingActivity<ActMainBinding>
+public class MainActivity extends BindingActivity<ActivityMainBinding>
         implements NavigationView.OnNavigationItemSelectedListener {
 
     @Override
     protected int getLayoutId() {
-        return R.layout.act_main;
+        return R.layout.activity_main;
     }
 
     @Override
@@ -58,12 +57,8 @@ public class MainActivity extends BindingActivity<ActMainBinding>
             case R.id.nav_collection:
                 break;
             case R.id.nav_about:
-                next(AboutFragment.newInstance());
                 break;
             case R.id.nav_test:
-//                start(SnapRecyclerFragment.newInstance());
-//                startDelay(ImagesFragment.newInstance());
-//                startDelay(TestCommentFragment.newInstance());
                 break;
         }
         return false;

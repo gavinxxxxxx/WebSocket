@@ -1,9 +1,8 @@
 package me.gavin.net;
 
-import java.util.List;
+import com.google.gson.JsonArray;
 
 import io.reactivex.Observable;
-import me.gavin.app.setting.License;
 import okhttp3.ResponseBody;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
@@ -36,6 +35,6 @@ public interface ClientAPI {
 
     @Headers("Cache-Control: max-stale=2419200")
     @GET("https://raw.githubusercontent.com/gavinxxxxxx/Sensual/master/json/license.json")
-    Observable<List<License>> getLicense();
+    Observable<JsonArray> getLicense();
 
 }

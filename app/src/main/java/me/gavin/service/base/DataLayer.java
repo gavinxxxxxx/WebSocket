@@ -1,10 +1,11 @@
 package me.gavin.service.base;
 
+import com.google.gson.JsonArray;
+
 import java.util.List;
 
 import io.reactivex.Observable;
 import me.gavin.app.message.Message;
-import me.gavin.app.setting.License;
 import okhttp3.ResponseBody;
 
 /**
@@ -37,7 +38,7 @@ public class DataLayer {
     public interface SettingService {
         Observable<ResponseBody> download(String url);
 
-        Observable<List<License>> getLicense();
+        Observable<JsonArray> getLicense();
     }
 
 }

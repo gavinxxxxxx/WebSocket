@@ -1,11 +1,10 @@
 package me.gavin.service;
 
-import java.util.List;
+import com.google.gson.JsonArray;
 
-import me.gavin.app.setting.License;
+import io.reactivex.Observable;
 import me.gavin.service.base.BaseManager;
 import me.gavin.service.base.DataLayer;
-import io.reactivex.Observable;
 import okhttp3.ResponseBody;
 
 /**
@@ -21,7 +20,7 @@ public class SettingManager extends BaseManager implements DataLayer.SettingServ
     }
 
     @Override
-    public Observable<List<License>> getLicense() {
+    public Observable<JsonArray> getLicense() {
         return getApi().getLicense();
     }
 }

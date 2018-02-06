@@ -3,21 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <import type="android.view.View" />
-
-        <variable
-            name="vm"
-            type="me.gavin.app.main.MainViewModel" />
-
-    </data>
-
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:fitsSystemWindows="true"
-        app:msg="@{vm.msg}">
+        app:statusBarCoverExAnchor="@{appBarLayout}">
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appBarLayout"
@@ -29,6 +21,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                app:layout_scrollFlags="scroll|enterAlways|snap"
                 app:popupTheme="@style/AppTheme.PopupOverlay"
                 app:theme="@style/ToolbarLightOverflow"
                 app:title="@string/app_name"
@@ -37,7 +30,9 @@
             <android.support.design.widget.TabLayout
                 android:id="@+id/tabLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                app:tabSelectedTextColor="@color/textColorPrimary"
+                app:tabTextColor="@color/colorTitle" />
 
         </android.support.design.widget.AppBarLayout>
 
