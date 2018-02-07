@@ -1,7 +1,10 @@
 package me.gavin.inject.component;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+
+import com.google.gson.Gson;
 
 import javax.inject.Singleton;
 
@@ -33,6 +36,10 @@ public interface ApplicationComponent {
 
     // 可以获取 ApplicationModule 及其 includes 的所有 Module 提供的对象（方法名随意）
     Application getApplication();
+
+    Gson getGson();
+
+    SharedPreferences getSharedPreferences();
 
     class Instance {
 

@@ -5,25 +5,38 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.inputmethod.EditorInfo;
 
-import me.gavin.base.BindingActivity;
+import me.gavin.base.BindingFragment;
+import me.gavin.base.BundleKey;
 import me.gavin.im.ws.R;
-import me.gavin.im.ws.databinding.ActivityChatBinding;
+import me.gavin.im.ws.databinding.FragmentChatBinding;
 import me.gavin.util.L;
 
 /**
  * 单聊 & 群聊
  *
- * @author gavin.xiong 2018/2/2
+ * @author gavin.xiong 2018/2/7
  */
-public class ChatActivity extends BindingActivity<ActivityChatBinding> {
+public class ChatFragment extends BindingFragment<FragmentChatBinding> {
+
+    private long mChatId;
+
+    public static ChatFragment newInstance(long chatId) {
+        Bundle args = new Bundle();
+        args.putLong(BundleKey.CHAT_ID, chatId);
+        ChatFragment fragment = new ChatFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     protected int getLayoutId() {
-        return R.layout.activity_chat;
+        return R.layout.fragment_chat;
     }
 
     @Override
     protected void afterCreate(@Nullable Bundle savedInstanceState) {
+        mChatId = getArguments().getLong(BundleKey.CHAT_ID);
+
         mBinding.editText.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEND) {
                 if (!TextUtils.isEmpty(mBinding.editText.getText().toString().trim())) {
@@ -41,8 +54,8 @@ public class ChatActivity extends BindingActivity<ActivityChatBinding> {
         long time = System.currentTimeMillis();
         Message message = new Message();
         message.setId("from:" + time);
-        message.setFrom("from");
-        message.setTo("to");
+        // message.setFrom("from"); // TODO: 2018/2/7
+        message.setTo(mChatId);
         message.setName("from");
         message.setContent(content);
         message.setUrl(null);

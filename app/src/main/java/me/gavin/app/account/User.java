@@ -1,66 +1,38 @@
 package me.gavin.app.account;
 
-import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Id;
-import org.greenrobot.greendao.annotation.Generated;
+import me.gavin.app.contact.Contact;
 
 /**
  * 用户
  *
- * @author gavin.xiong 2018/2/6
+ * @author gavin.xiong 2018/2/7
  */
-@Entity
-public class User {
+public class User extends Contact {
 
-    @Id(autoincrement = true)
-    private Long id;
-    private String name;
-    private String nick;
-    private String avatar;
+    private boolean logged;
+    private String token;
 
-    @Generated(hash = 1909989624)
-    public User(Long id, String name, String nick, String avatar) {
-        this.id = id;
-        this.name = name;
-        this.nick = nick;
-        this.avatar = avatar;
+    public boolean isLogged() {
+        return logged;
     }
 
-    @Generated(hash = 586692638)
-    public User() {
+    public void setLogged(boolean logged) {
+        this.logged = logged;
     }
 
-    public Long getId() {
-        return this.id;
+    public String getToken() {
+        return token;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setToken(String token) {
+        this.token = token;
     }
 
-    public String getName() {
-        return this.name;
+    @Override
+    public String toString() {
+        return "User{" +
+                "logged=" + logged +
+                ", token='" + token + '\'' +
+                "} " + super.toString();
     }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getNick() {
-        return this.nick;
-    }
-
-    public void setNick(String nick) {
-        this.nick = nick;
-    }
-
-    public String getAvatar() {
-        return this.avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
-
-
 }

@@ -15,6 +15,7 @@ import dagger.Provides;
 @Module(includes = {
         DataLayerModule.class,
         DatabaseModule.class,
+        SharedPreferencesModule.class,
         ClientAPIModule.class,
         CompositeDisposableModule.class
 })

@@ -23,12 +23,8 @@ public class AssetsUtils {
      * @param assetPath the asset path
      * @return String string
      */
-    public static String readText(Context context, String assetPath) {
-        try {
-            return toString(context.getAssets().open(assetPath));
-        } catch (Exception e) {
-            return "";
-        }
+    public static String readText(Context context, String assetPath) throws IOException {
+        return toString(context.getAssets().open(assetPath));
     }
 
     /**
@@ -37,19 +33,14 @@ public class AssetsUtils {
      * @param is the is
      * @return the string
      */
-    private static String toString(InputStream is) {
-        StringBuilder sb = new StringBuilder();
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+    private static String toString(InputStream is) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+            StringBuilder sb = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
                 sb.append(line);
             }
-            is.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+            return sb.toString();
         }
-        return sb.toString();
     }
-
 }

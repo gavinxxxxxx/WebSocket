@@ -14,6 +14,7 @@
     <color name="textColorPrimary">#2C2C2C</color>
     <color name="textColorSecondary">#777777</color>
     <color name="textColorTertiary">#AAAAAA</color>
+    <color name="textColorHint">#BBBBBB</color>
 
     <!-- 图片占位色 -->
     <color name="colorHolder00">#FFEBEE</color>

@@ -33,13 +33,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="me.gavin.app.message.ChatActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.TEST" />
-                <category android:name="android.intent.category.TEST" />
-            </intent-filter>
-        </activity>
-
         <!-- 使用 okhttp3 加载图片 -->
         <meta-data
             android:name="me.gavin.util.glide.GlideQualityModule"

@@ -4,28 +4,32 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 
 /**
- * 这里是萌萌哒注释菌
+ * 消息
  *
  * @author gavin.xiong 2018/2/1.
  */
 @Entity
 public class Message {
 
-    private String id;
-    private String from;
-    private String to;
-    private String name;
-    private String content;
-    private String url;
-    private int width;
-    private int height;
-    private int type;
-    private int state;
-    private long time;
+    private String id; // 消息 id
+    private long from; // 消息发送人 id
+    private long to; // 消息接收人id - 群聊为群 id
+    private String name; // 消息发送人名字
+    private String content; // 消息体
+    private String url; // 消息链接 - 图片文件消息
+    private int width; // 消息图片宽
+    private int height; // 消息图片高
+    private long length; // 消息长度 图片&文件：大小 语音：时间
+    private int type; // 消息类型 0：文本 1：图片 2：语音 3：...
+    private int attr; // 消息类型 0：单聊 1：群聊 2：...
+    private int state; // 已读状态 0：未读 1：已读
+    private long time; // 消息时间
 
-    @Generated(hash = 771535110)
-    public Message(String id, String from, String to, String name, String content,
-            String url, int width, int height, int type, int state, long time) {
+
+    @Generated(hash = 1937749288)
+    public Message(String id, long from, long to, String name, String content,
+                   String url, int width, int height, long length, int type, int attr,
+                   int state, long time) {
         this.id = id;
         this.from = from;
         this.to = to;
@@ -34,7 +38,9 @@ public class Message {
         this.url = url;
         this.width = width;
         this.height = height;
+        this.length = length;
         this.type = type;
+        this.attr = attr;
         this.state = state;
         this.time = time;
     }
@@ -51,19 +57,19 @@ public class Message {
         this.id = id;
     }
 
-    public String getFrom() {
+    public long getFrom() {
         return from;
     }
 
-    public void setFrom(String from) {
+    public void setFrom(long from) {
         this.from = from;
     }
 
-    public String getTo() {
+    public long getTo() {
         return to;
     }
 
-    public void setTo(String to) {
+    public void setTo(long to) {
         this.to = to;
     }
 
@@ -107,12 +113,28 @@ public class Message {
         this.height = height;
     }
 
+    public long getLength() {
+        return length;
+    }
+
+    public void setLength(long length) {
+        this.length = length;
+    }
+
     public int getType() {
         return type;
     }
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public int getAttr() {
+        return attr;
+    }
+
+    public void setAttr(int attr) {
+        this.attr = attr;
     }
 
     public int getState() {

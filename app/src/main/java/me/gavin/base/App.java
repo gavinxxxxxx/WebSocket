@@ -2,6 +2,7 @@ package me.gavin.base;
 
 import android.app.Application;
 
+import me.gavin.app.account.User;
 import me.gavin.inject.component.ApplicationComponent;
 import me.gavin.inject.component.DaggerApplicationComponent;
 import me.gavin.inject.module.ApplicationModule;
@@ -13,10 +14,15 @@ import me.gavin.inject.module.ApplicationModule;
  */
 public class App extends Application {
 
+    private static User sUser;
+
     @Override
     public void onCreate() {
         super.onCreate();
         initDagger();
+        setUser(ApplicationComponent.Instance.get().getGson()
+                .fromJson(ApplicationComponent.Instance.get().getSharedPreferences()
+                        .getString(BundleKey.CHAT_ID, ""), User.class));
     }
 
     private void initDagger() {
@@ -28,5 +34,13 @@ public class App extends Application {
 
     public static Application get() {
         return ApplicationComponent.Instance.get().getApplication();
+    }
+
+    public static User getUser() {
+        return sUser;
+    }
+
+    public static void setUser(User user) {
+        sUser = user;
     }
 }

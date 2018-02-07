@@ -14,6 +14,7 @@ import dagger.Module;
 import dagger.Provides;
 import me.gavin.im.ws.BuildConfig;
 import me.gavin.net.ClientAPI;
+import me.gavin.net.interceptor.HeaderInterceptor;
 import me.gavin.util.CacheHelper;
 import me.gavin.util.L;
 import me.gavin.util.okhttp.OKHttpCacheInterceptor;
@@ -35,7 +36,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @Module
 public class ClientAPIModule {
 
-    private static final String BASE_URL = "http://news-at.zhihu.com/api/4/";
+    private static final String BASE_URL = "http://m.yy-happy.com/yy-app-web/api/";
 
     /**
      * 创建一个ClientAPI的实现类单例对象
@@ -107,6 +108,7 @@ public class ClientAPIModule {
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(10, TimeUnit.SECONDS)
                 .writeTimeout(10, TimeUnit.SECONDS)
+                .addInterceptor(new HeaderInterceptor())
                 .addInterceptor(logging)
                 .addInterceptor(logging2)
                 .addInterceptor(cacheInterceptor)

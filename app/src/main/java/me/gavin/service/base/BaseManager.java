@@ -1,5 +1,7 @@
 package me.gavin.service.base;
 
+import android.content.SharedPreferences;
+
 import com.google.gson.Gson;
 
 import javax.inject.Inject;
@@ -22,6 +24,8 @@ public abstract class BaseManager {
     Lazy<Gson> mGson;
     @Inject
     Lazy<DaoSession> mDaoSession;
+    @Inject
+    Lazy<SharedPreferences> mPreferences;
 
     public BaseManager() {
         ApplicationComponent.Instance.get().inject(this);
@@ -37,5 +41,9 @@ public abstract class BaseManager {
 
     public DaoSession getDaoSession() {
         return mDaoSession.get();
+    }
+
+    public SharedPreferences getSharedPreferences() {
+        return mPreferences.get();
     }
 }
