@@ -2,14 +2,20 @@ package me.gavin.app.message;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.view.inputmethod.EditorInfo;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import me.gavin.base.App;
 import me.gavin.base.BindingFragment;
 import me.gavin.base.BundleKey;
+import me.gavin.base.RxTransformers;
 import me.gavin.im.ws.R;
 import me.gavin.im.ws.databinding.FragmentChatBinding;
-import me.gavin.util.L;
 
 /**
  * 单聊 & 群聊
@@ -19,6 +25,8 @@ import me.gavin.util.L;
 public class ChatFragment extends BindingFragment<FragmentChatBinding> {
 
     private long mChatId;
+    private final List<Message> mMessageList = new ArrayList<>();
+    private ChatAdapter mAdapter;
 
     public static ChatFragment newInstance(long chatId) {
         Bundle args = new Bundle();
@@ -37,11 +45,18 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
     protected void afterCreate(@Nullable Bundle savedInstanceState) {
         mChatId = getArguments().getLong(BundleKey.CHAT_ID);
 
+        mAdapter = new ChatAdapter(getContext(), mMessageList);
+        mBinding.recycler.setAdapter(mAdapter);
+
         mBinding.editText.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEND) {
                 if (!TextUtils.isEmpty(mBinding.editText.getText().toString().trim())) {
                     Message msg = createMessage(mBinding.editText.getText().toString());
-                    L.e("--> " + msg);
+                    getDataLayer().getMessageService().insert(msg);
+                    mBinding.editText.setText(null);
+                    mMessageList.add(0, msg);
+                    mAdapter.notifyItemInserted(0);
+                    mBinding.recycler.scrollToPosition(0);
                     // TODO: 2018/2/3 发消息
                 }
                 return true;
@@ -50,18 +65,33 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
         });
     }
 
+    @Override
+    public void onLazyInitView(@Nullable Bundle savedInstanceState) {
+        super.onLazyInitView(savedInstanceState);
+        getData();
+    }
+
     private Message createMessage(String content) {
         long time = System.currentTimeMillis();
         Message message = new Message();
-        message.setId("from:" + time);
-        // message.setFrom("from"); // TODO: 2018/2/7
+        message.setId(String.format("%s%s", App.getUser().getId(), time));
+        message.setFrom(App.getUser().getId());
         message.setTo(mChatId);
-        message.setName("from");
+        message.setName(App.getUser().getNick());
         message.setContent(content);
-        message.setUrl(null);
-        message.setState(0);
-        message.setType(0);
         message.setTime(time);
         return message;
+    }
+
+    private void getData() {
+        getDataLayer().getMessageService()
+                .getMessage(mChatId, 0)
+                .compose(RxTransformers.applySchedulers())
+                .subscribe(messages -> {
+                    mMessageList.clear();
+                    mMessageList.addAll(messages);
+                    Collections.reverse(mMessageList);
+                    mAdapter.notifyDataSetChanged();
+                }, throwable -> Snackbar.make(mBinding.recycler, throwable.getMessage(), Snackbar.LENGTH_LONG).show());
     }
 }

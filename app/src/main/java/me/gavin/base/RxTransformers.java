@@ -46,12 +46,12 @@ public class RxTransformers {
     /**
      * http 结果过滤 -  根据 code & data
      */
-    public static <T> ObservableTransformer<Result<T>, Result<T>> filterResultCD() {
+    public static <T> ObservableTransformer<Result<T>, T> filterResultCD() {
         return upstream -> upstream
                 .map(result -> {
                     if (!result.isSuccess() || result.getData() == null)
                         throw new IOException(result.getMsg());
-                    return result;
+                    return result.getData();
                 });
     }
 }

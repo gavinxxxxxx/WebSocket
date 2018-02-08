@@ -24,6 +24,7 @@
                 android:layout_weight="1"
                 app:layoutManager="LinearLayoutManager"
                 app:reverseLayout="true"
+                tools:itemCount="2"
                 tools:listitem="@layout/item_message" />
 
             <FrameLayout

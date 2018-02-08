@@ -3,11 +3,7 @@ package me.gavin.app.main;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import java.util.concurrent.TimeUnit;
-
-import io.reactivex.Observable;
 import me.gavin.base.BindingFragment;
-import me.gavin.base.RxTransformers;
 import me.gavin.im.ws.R;
 import me.gavin.im.ws.databinding.FragmentMainBinding;
 
@@ -30,18 +26,6 @@ public class MainFragment extends BindingFragment<FragmentMainBinding> {
     @Override
     protected void afterCreate(@Nullable Bundle savedInstanceState) {
         initViewPager();
-
-        Observable.timer(5, TimeUnit.SECONDS)
-                .flatMap(arg0 -> getDataLayer()
-                        .getMessageService()
-                        .getMessage("", 0))
-                .compose(RxTransformers.log())
-                .flatMap(messages -> getDataLayer()
-                        .getSettingService()
-                        .getLicense())
-                .compose(RxTransformers.log())
-                .compose(RxTransformers.applySchedulers())
-                .subscribe();
     }
 
     private void initViewPager() {
@@ -50,5 +34,4 @@ public class MainFragment extends BindingFragment<FragmentMainBinding> {
         mBinding.viewPager.setOffscreenPageLimit(3);
         mBinding.tabLayout.setupWithViewPager(mBinding.viewPager);
     }
-
 }

@@ -51,7 +51,11 @@ public class DataLayer {
     }
 
     public interface MessageService {
-        Observable<List<Message>> getMessage(String chatId, int offset);
+        Observable<List<Message>> getMessage(long chatId, int offset);
+
+        void insert(Message message);
+
+        Observable<List<Message>> getChat();
     }
 
     public interface ContactService {

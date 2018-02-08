@@ -46,16 +46,16 @@ public class LoginFragment extends BindingFragment<FragmentLoginBinding> {
                 .login(account, pass)
                 .delay(2000, TimeUnit.MILLISECONDS)
                 .compose(RxTransformers.filterResultCD())
-                .flatMap(result -> {
-                    App.setUser(result.getData());
+                .flatMap(user -> {
+                    App.setUser(user);
                     return getDataLayer().getAccountService().getUserInfo(account);
                 })
                 .compose(RxTransformers.filterResultCD())
                 .compose(RxTransformers.applySchedulers())
                 .doOnSubscribe(mCompositeDisposable::add)
-                .subscribe(result -> {
-                    result.getData().setLogged(true);
-                    App.setUser(result.getData());
+                .subscribe(user -> {
+                    user.setLogged(true);
+                    App.setUser(user);
                     startWithPop(MainFragment.newInstance());
                 }, throwable -> Snackbar.make(mBinding.btnRegister, throwable.getMessage(), Snackbar.LENGTH_LONG).show());
     }

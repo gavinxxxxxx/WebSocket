@@ -6,7 +6,6 @@ import android.support.design.widget.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import me.gavin.app.main.StartFragmentEvent;
 import me.gavin.app.message.ChatFragment;
@@ -55,7 +54,6 @@ public class ContactsFragment extends BindingFragment<LayoutRecyclerBinding> {
     private void getData() {
         getDataLayer().getContactService()
                 .getContacts()
-                .delay(1500, TimeUnit.MILLISECONDS)
                 .compose(RxTransformers.applySchedulers())
                 .doOnSubscribe(disposable -> {
                     mCompositeDisposable.add(disposable);

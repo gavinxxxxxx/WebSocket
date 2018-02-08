@@ -16,6 +16,7 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import me.gavin.app.account.LoginFragment;
+import me.gavin.base.App;
 import me.gavin.base.BindingActivity;
 import me.gavin.base.RxBus;
 import me.gavin.im.ws.R;
@@ -38,11 +39,11 @@ public class MainActivity extends BindingActivity<ActivityMainBinding>
                     View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
         if (savedInstanceState == null) {
-//            if (App.getUser() != null && App.getUser().isLogged()) {
-//                loadRootFragment(R.id.holder, MainFragment.newInstance());
-//            } else {
-            loadRootFragment(R.id.holder, LoginFragment.newInstance());
-//            }
+            if (App.getUser() != null && App.getUser().isLogged()) {
+                loadRootFragment(R.id.holder, MainFragment.newInstance());
+            } else {
+                loadRootFragment(R.id.holder, LoginFragment.newInstance());
+            }
         }
 
         subscribeEvent();

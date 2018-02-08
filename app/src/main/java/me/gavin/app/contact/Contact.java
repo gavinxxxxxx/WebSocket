@@ -14,8 +14,8 @@ import org.greenrobot.greendao.annotation.Id;
 @Entity
 public class Contact {
 
-    @Id(autoincrement = true)
-    @SerializedName("id")
+    @Id
+    @SerializedName(value = "id", alternate = "userId")
     private Long id;
     @SerializedName(value = "name", alternate = "account")
     private String name;
