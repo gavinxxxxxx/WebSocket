@@ -9,6 +9,7 @@ import java.util.List;
 
 import me.gavin.app.main.StartFragmentEvent;
 import me.gavin.app.message.ChatFragment;
+import me.gavin.app.message.Message;
 import me.gavin.base.BindingFragment;
 import me.gavin.base.RxBus;
 import me.gavin.base.RxTransformers;
@@ -39,8 +40,10 @@ public class ContactsFragment extends BindingFragment<LayoutRecyclerBinding> {
     protected void afterCreate(@Nullable Bundle savedInstanceState) {
         mAdapter = new BindingAdapter<>(getContext(), mContacts, R.layout.item_contact);
         mBinding.recycler.setAdapter(mAdapter);
-        mAdapter.setOnItemClickListener(i ->
-                RxBus.get().post(new StartFragmentEvent(ChatFragment.newInstance(mContacts.get(i).getId()))));
+        mAdapter.setOnItemClickListener(i -> {
+            ChatFragment fragment = ChatFragment.newInstance(mContacts.get(i).getId(), Message.CHAT_TYPE_SINGLE);
+            RxBus.get().post(new StartFragmentEvent(fragment));
+        });
 
         mBinding.refreshLayout.setOnRefreshListener(this::getData);
     }

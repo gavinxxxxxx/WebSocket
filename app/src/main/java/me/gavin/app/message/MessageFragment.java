@@ -38,15 +38,18 @@ public class MessageFragment extends BindingFragment<LayoutRecyclerBinding> {
     protected void afterCreate(@Nullable Bundle savedInstanceState) {
         mAdapter = new BindingAdapter<>(getContext(), mMessageList, R.layout.item_chat);
         mBinding.recycler.setAdapter(mAdapter);
-        mAdapter.setOnItemClickListener(i ->
-                RxBus.get().post(new StartFragmentEvent(ChatFragment.newInstance(mMessageList.get(i).getFrom()))));
+        mAdapter.setOnItemClickListener(i -> {
+            Message t = mMessageList.get(i);
+            ChatFragment fragment = ChatFragment.newInstance(t.getChatId(), t.getChatType());
+            RxBus.get().post(new StartFragmentEvent(fragment));
+        });
 
         mBinding.refreshLayout.setOnRefreshListener(this::getData);
     }
 
     @Override
-    public void onLazyInitView(@Nullable Bundle savedInstanceState) {
-        super.onLazyInitView(savedInstanceState);
+    public void onSupportVisible() {
+        super.onSupportVisible();
         getData();
     }
 

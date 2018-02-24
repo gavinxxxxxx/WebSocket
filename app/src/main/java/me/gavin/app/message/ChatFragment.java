@@ -25,12 +25,14 @@ import me.gavin.im.ws.databinding.FragmentChatBinding;
 public class ChatFragment extends BindingFragment<FragmentChatBinding> {
 
     private long mChatId;
+    private int mChatType;
     private final List<Message> mMessageList = new ArrayList<>();
     private ChatAdapter mAdapter;
 
-    public static ChatFragment newInstance(long chatId) {
+    public static ChatFragment newInstance(long chatId, int chatType) {
         Bundle args = new Bundle();
         args.putLong(BundleKey.CHAT_ID, chatId);
+        args.putInt(BundleKey.CHAT_TYPE, chatType);
         ChatFragment fragment = new ChatFragment();
         fragment.setArguments(args);
         return fragment;
@@ -44,6 +46,7 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
     @Override
     protected void afterCreate(@Nullable Bundle savedInstanceState) {
         mChatId = getArguments().getLong(BundleKey.CHAT_ID);
+        mChatType = getArguments().getInt(BundleKey.CHAT_TYPE);
 
         mAdapter = new ChatAdapter(getContext(), mMessageList);
         mBinding.recycler.setAdapter(mAdapter);
@@ -75,17 +78,17 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
         long time = System.currentTimeMillis();
         Message message = new Message();
         message.setId(String.format("%s%s", App.getUser().getId(), time));
-        message.setFrom(App.getUser().getId());
-        message.setTo(mChatId);
-        message.setName(App.getUser().getNick());
         message.setContent(content);
         message.setTime(time);
+        message.setSender(App.getUser().getId());
+        message.setChatId(mChatId);
+        message.setChatType(mChatType);
         return message;
     }
 
     private void getData() {
         getDataLayer().getMessageService()
-                .getMessage(mChatId, 0)
+                .getMessage(mChatId, mChatType, 0)
                 .compose(RxTransformers.applySchedulers())
                 .subscribe(messages -> {
                     mMessageList.clear();

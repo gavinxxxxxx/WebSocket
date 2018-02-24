@@ -26,7 +26,7 @@ public class ContactManager extends BaseManager implements DataLayer.ContactServ
                 .map(s -> {
                     List<Contact> contacts = getGson().fromJson(s, new TypeToken<ArrayList<Contact>>() {}.getType());
                     for (int i = 0; i < contacts.size(); i++) {
-                        contacts.get(i).setId((long) i);
+                        contacts.get(i).setId((long) i + 10000);
                     }
                     getDaoSession().getContactDao().deleteAll();
                     getDaoSession().getContactDao().insertInTx(contacts);

@@ -7,7 +7,7 @@ import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 
 /**
- * 用户
+ * 联系人 - 用户 | 群组 | 通知 | 功能账号
  *
  * @author gavin.xiong 2018/2/6
  */

@@ -4,8 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 
-import java.util.concurrent.TimeUnit;
-
 import me.gavin.app.main.MainFragment;
 import me.gavin.base.App;
 import me.gavin.base.BindingFragment;
@@ -44,7 +42,6 @@ public class LoginFragment extends BindingFragment<FragmentLoginBinding> {
         String pass = MD5.md5(mBinding.etPass.getText().toString().trim());
         getDataLayer().getAccountService()
                 .login(account, pass)
-                .delay(2000, TimeUnit.MILLISECONDS)
                 .compose(RxTransformers.filterResultCD())
                 .flatMap(user -> {
                     App.setUser(user);

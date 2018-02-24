@@ -20,9 +20,10 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         initDagger();
-        setUser(ApplicationComponent.Instance.get().getGson()
-                .fromJson(ApplicationComponent.Instance.get().getSharedPreferences()
-                        .getString(BundleKey.CHAT_ID, ""), User.class));
+        setUser(ApplicationComponent.Instance.get()
+                .getGson().fromJson(ApplicationComponent.Instance.get()
+                        .getSharedPreferences()
+                        .getString(BundleKey.USER, ""), User.class));
     }
 
     private void initDagger() {
@@ -42,5 +43,10 @@ public class App extends Application {
 
     public static void setUser(User user) {
         sUser = user;
+        ApplicationComponent.Instance.get()
+                .getSharedPreferences()
+                .edit()
+                .putString(BundleKey.USER, ApplicationComponent.Instance.get().getGson().toJson(user))
+                .apply();
     }
 }
