@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import me.gavin.app.contact.ContactsFragment;
 import me.gavin.app.message.MessageFragment;
+import me.gavin.app.mine.MineFragment;
 
 /**
  * RxJavaPagerAdapter
@@ -32,7 +33,7 @@ class MainPagerAdapter extends FragmentStatePagerAdapter {
             case 1:
                 return ContactsFragment.newInstance();
             default:
-                return MessageFragment.newInstance();
+                return MineFragment.newInstance();
         }
     }
 

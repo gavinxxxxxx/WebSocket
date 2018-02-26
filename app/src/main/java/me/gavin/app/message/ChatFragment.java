@@ -113,7 +113,7 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
         long time = System.currentTimeMillis();
         Message message = new Message();
         message.setId(String.format("%s%s", mChatId, time));
-        message.setContent(content);
+        message.setContent("Re:" + content);
         message.setTime(time);
         message.setSender(mChatId);
         message.setChatId(mChatId);
