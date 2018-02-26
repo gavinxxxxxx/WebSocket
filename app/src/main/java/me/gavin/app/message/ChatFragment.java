@@ -17,6 +17,13 @@ import me.gavin.base.BundleKey;
 import me.gavin.base.RxTransformers;
 import me.gavin.im.ws.R;
 import me.gavin.im.ws.databinding.FragmentChatBinding;
+import me.gavin.util.L;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
+import okio.ByteString;
 
 /**
  * 单聊 & 群聊
@@ -81,11 +88,15 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
                     mAdapter.notifyItemInserted(0);
                     mBinding.recycler.scrollToPosition(0);
                     // TODO: 2018/2/3 发消息
+
+                    L.e(mWebSocket.send(msg.getContent()));
                 }
                 return true;
             }
             return false;
         });
+
+        createWebSocket();
     }
 
     @Override
@@ -134,5 +145,46 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
                     Collections.reverse(mMessageList);
                     mAdapter.notifyDataSetChanged();
                 }, throwable -> Snackbar.make(mBinding.recycler, throwable.getMessage(), Snackbar.LENGTH_LONG).show());
+    }
+
+    WebSocket mWebSocket;
+
+    private void createWebSocket() {
+        OkHttpClient client = new OkHttpClient.Builder().build();
+        mWebSocket = client.newWebSocket(new Request.Builder()
+                .url("ws://m.yy-happy.com/yy-app-web/websocket/socketServer.do")
+                .build(), new WebSocketListener() {
+            @Override
+            public void onOpen(WebSocket webSocket, Response response) {
+                L.e("onOpen - " + response);
+            }
+
+            @Override
+            public void onMessage(WebSocket webSocket, String text) {
+                L.e("onMessage - " + text);
+            }
+
+            @Override
+            public void onMessage(WebSocket webSocket, ByteString bytes) {
+                L.e("onMessageB - " + bytes);
+            }
+
+            @Override
+            public void onClosed(WebSocket webSocket, int code, String reason) {
+                L.e("onClosed - " + reason);
+            }
+
+            @Override
+            public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+                L.e("onFailure - " + t.getMessage());
+            }
+        });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mWebSocket.send("END");
+        mWebSocket.close(1000, "close by me");
     }
 }
