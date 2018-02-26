@@ -26,13 +26,9 @@ public class BindingAdapters {
         ImageLoader.loadImage(imageView, url);
     }
 
-    @BindingAdapter({"headUrl"})
-    public static void loadHead(ImageView imageView, String url) {
-        if (TextUtils.isEmpty(url)) {
-            imageView.setImageResource(R.mipmap.ic_launcher);
-        } else {
-            ImageLoader.loadHead(imageView, url);
-        }
+    @BindingAdapter({"avatarUrl"})
+    public static void loadAvatar(ImageView imageView, String url) {
+        ImageLoader.loadAvatar(imageView, url);
     }
 
     @BindingAdapter({"roundImageUrl"})
@@ -46,7 +42,6 @@ public class BindingAdapters {
             imageView.setImageResource(R.mipmap.ic_launcher);
         } else {
             imageView.setImageResource(resId);
-//            Glide.with(imageView.getContext()).load(resId).into(imageView);
         }
     }
 
@@ -85,5 +80,4 @@ public class BindingAdapters {
             });
         }
     }
-
 }

@@ -59,6 +59,8 @@ public class DataLayer {
     }
 
     public interface ContactService {
+        Observable<Contact> getContact(long id);
+
         Observable<List<Contact>> getContacts();
     }
 

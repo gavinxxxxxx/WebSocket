@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import me.gavin.app.contact.Contact;
 import me.gavin.base.App;
 import me.gavin.base.BindingFragment;
 import me.gavin.base.BundleKey;
@@ -26,6 +27,9 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
 
     private long mChatId;
     private int mChatType;
+
+    private Contact mContact;
+
     private final List<Message> mMessageList = new ArrayList<>();
     private ChatAdapter mAdapter;
 
@@ -48,6 +52,16 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
         mChatId = getArguments().getLong(BundleKey.CHAT_ID);
         mChatType = getArguments().getInt(BundleKey.CHAT_TYPE);
 
+        mBinding.includeToolbar.toolbar.setNavigationIcon(R.drawable.vt_arrow_back_24dp);
+        mBinding.includeToolbar.toolbar.setNavigationOnClickListener(v -> pop());
+        getDataLayer().getContactService()
+                .getContact(mChatId)
+                .compose(RxTransformers.applySchedulers())
+                .subscribe(contact -> {
+                    mContact = contact;
+                    mBinding.includeToolbar.toolbar.setTitle(mContact.getName());
+                }, throwable -> Snackbar.make(mBinding.recycler, throwable.getMessage(), Snackbar.LENGTH_LONG).show());
+
         mAdapter = new ChatAdapter(getContext(), mMessageList);
         mBinding.recycler.setAdapter(mAdapter);
 
@@ -58,6 +72,12 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
                     getDataLayer().getMessageService().insert(msg);
                     mBinding.editText.setText(null);
                     mMessageList.add(0, msg);
+                    mAdapter.notifyItemInserted(0);
+                    mBinding.recycler.scrollToPosition(0);
+
+                    Message re = createMessageRe(msg.getContent());
+                    getDataLayer().getMessageService().insert(re);
+                    mMessageList.add(0, re);
                     mAdapter.notifyItemInserted(0);
                     mBinding.recycler.scrollToPosition(0);
                     // TODO: 2018/2/3 发消息
@@ -83,6 +103,24 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
         message.setSender(App.getUser().getId());
         message.setChatId(mChatId);
         message.setChatType(mChatType);
+
+        message.setName(App.getUser().getName());
+        message.setAvatar(App.getUser().getAvatar());
+        return message;
+    }
+
+    private Message createMessageRe(String content) {
+        long time = System.currentTimeMillis();
+        Message message = new Message();
+        message.setId(String.format("%s%s", mChatId, time));
+        message.setContent(content);
+        message.setTime(time);
+        message.setSender(mChatId);
+        message.setChatId(mChatId);
+        message.setChatType(mChatType);
+
+        message.setName(mContact.getName());
+        message.setAvatar(mContact.getAvatar());
         return message;
     }
 

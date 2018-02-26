@@ -102,7 +102,7 @@ public class ImageLoader {
     /**
      * 加载头像
      */
-    public static void loadHead(ImageView imageView, String url) {
+    public static void loadAvatar(ImageView imageView, String url) {
         Glide.with(imageView.getContext())
                 .load(url)
                 .placeholder(R.mipmap.ic_launcher)
@@ -115,7 +115,7 @@ public class ImageLoader {
     /**
      * 加载头像
      */
-    public static void loadHead(Fragment fragment, ImageView imageView, String url) {
+    public static void loadAvatar(Fragment fragment, ImageView imageView, String url) {
         Glide.with(fragment)
                 .load(url)
                 .placeholder(R.mipmap.ic_launcher)

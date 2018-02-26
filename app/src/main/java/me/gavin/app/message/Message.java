@@ -2,6 +2,8 @@ package me.gavin.app.message;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.Transient;
 
 /**
  * 消息
@@ -18,6 +20,7 @@ public class Message {
     public static final int CHAT_TYPE_SINGLE = 0; // 单聊
     public static final int CHAT_TYPE_GROUP = 1; // 群聊
 
+    @Id
     private String id; // 消息 id - 发送时生成
     private String content; // 消息体
     private String url; // 消息链接 - 图片文件消息
@@ -30,6 +33,11 @@ public class Message {
     private long sender; // 消息发送人 id
     private long chatId; // 会话 id - 群聊为群 id - 存储时生成
     private int chatType; // 会话类型 0：单聊 1：群聊 2：...
+
+    @Transient
+    private String name; // 消息发送人名字
+    @Transient
+    private String avatar; // 消息发送人头像
 
     @Generated(hash = 711428962)
     public Message(String id, String content, String url, int width, int height,
@@ -147,6 +155,22 @@ public class Message {
 
     public void setChatType(int chatType) {
         this.chatType = chatType;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     @Override
