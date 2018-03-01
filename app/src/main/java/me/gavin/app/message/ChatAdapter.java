@@ -29,7 +29,9 @@ public class ChatAdapter extends RecyclerAdapter<Message, ItemMessageBinding> {
     protected void onBind(RecyclerHolder<ItemMessageBinding> holder, int position, Message t) {
         if (t.getSender() != App.getUser().getId()) { // 收
             holder.binding.ivLAvatar.setVisibility(View.VISIBLE);
+            holder.binding.tvLText.setVisibility(View.VISIBLE);
             holder.binding.ivRAvatar.setVisibility(View.GONE);
+            holder.binding.tvRText.setVisibility(View.GONE);
             if (TextUtils.isEmpty(t.getAvatar())) {
                 holder.binding.ivLAvatar.setImageResource(R.mipmap.ic_launcher);
             } else {
@@ -38,7 +40,9 @@ public class ChatAdapter extends RecyclerAdapter<Message, ItemMessageBinding> {
             holder.binding.tvLText.setText(t.getContent());
         } else { // 发
             holder.binding.ivLAvatar.setVisibility(View.GONE);
+            holder.binding.tvLText.setVisibility(View.GONE);
             holder.binding.ivRAvatar.setVisibility(View.VISIBLE);
+            holder.binding.tvRText.setVisibility(View.VISIBLE);
             if (TextUtils.isEmpty(t.getAvatar())) {
                 holder.binding.ivRAvatar.setImageResource(R.mipmap.ic_launcher);
             } else {

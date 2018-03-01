@@ -4,6 +4,7 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
+import org.greenrobot.greendao.annotation.Unique;
 
 /**
  * 消息
@@ -19,8 +20,14 @@ public class Message {
 
     public static final int CHAT_TYPE_SINGLE = 0; // 单聊
     public static final int CHAT_TYPE_GROUP = 1; // 群聊
+    public static final int CHAT_TYPE_OFFICIAL = 2; // 官方账号 - 公众号
 
-    @Id
+    public static final int CHAT_TYPE_CONTACT_ADD = 100; // 好友申请
+    public static final int CHAT_TYPE_CONTACT_DEL = 101; // 好友删除
+
+    @Id(autoincrement = true)
+    private Long _id; // id - 主键 自增 无意义
+    @Unique
     private String id; // 消息 id - 发送时生成
     private String content; // 消息体
     private String url; // 消息链接 - 图片文件消息
@@ -32,17 +39,19 @@ public class Message {
     private long time; // 消息时间
     private long sender; // 消息发送人 id
     private long chatId; // 会话 id - 群聊为群 id - 存储时生成
-    private int chatType; // 会话类型 0：单聊 1：群聊 2：...
+    private int chatType; // 会话类型 0：单聊 1：群聊 2：官方账号 3：...
+    private String extra; // 拓展 - json 字符串
 
     @Transient
     private String name; // 消息发送人名字
     @Transient
     private String avatar; // 消息发送人头像
 
-    @Generated(hash = 711428962)
-    public Message(String id, String content, String url, int width, int height,
-                   long length, int type, int state, long time, long sender, long chatId,
-                   int chatType) {
+    @Generated(hash = 566431938)
+    public Message(Long _id, String id, String content, String url, int width,
+                   int height, long length, int type, int state, long time, long sender,
+                   long chatId, int chatType, String extra) {
+        this._id = _id;
         this.id = id;
         this.content = content;
         this.url = url;
@@ -55,10 +64,19 @@ public class Message {
         this.sender = sender;
         this.chatId = chatId;
         this.chatType = chatType;
+        this.extra = extra;
     }
 
     @Generated(hash = 637306882)
     public Message() {
+    }
+
+    public Long get_id() {
+        return this._id;
+    }
+
+    public void set_id(Long _id) {
+        this._id = _id;
     }
 
     public String getId() {
@@ -157,6 +175,14 @@ public class Message {
         this.chatType = chatType;
     }
 
+    public String getExtra() {
+        return this.extra;
+    }
+
+    public void setExtra(String extra) {
+        this.extra = extra;
+    }
+
     public String getName() {
         return name;
     }
@@ -178,6 +204,7 @@ public class Message {
         return "Message{" +
                 "content='" + content + '\'' +
                 ", sender=" + sender +
+                ", id=" + id +
                 ", chatId=" + chatId +
                 '}';
     }

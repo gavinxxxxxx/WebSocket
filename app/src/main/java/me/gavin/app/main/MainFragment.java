@@ -1,8 +1,10 @@
 package me.gavin.app.main;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
+import me.gavin.app.im.IMService;
 import me.gavin.base.BindingFragment;
 import me.gavin.im.ws.R;
 import me.gavin.im.ws.databinding.FragmentMainBinding;
@@ -25,6 +27,7 @@ public class MainFragment extends BindingFragment<FragmentMainBinding> {
 
     @Override
     protected void afterCreate(@Nullable Bundle savedInstanceState) {
+        getActivity().startService(new Intent(getActivity(), IMService.class));
         initViewPager();
     }
 

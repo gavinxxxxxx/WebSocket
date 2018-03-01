@@ -10,20 +10,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import me.gavin.app.contact.Contact;
+import me.gavin.app.im.ReceiveMsgEvent;
+import me.gavin.app.im.SendMsgEvent;
 import me.gavin.base.App;
 import me.gavin.base.BindingFragment;
 import me.gavin.base.BundleKey;
+import me.gavin.base.RxBus;
 import me.gavin.base.RxTransformers;
 import me.gavin.im.ws.R;
 import me.gavin.im.ws.databinding.FragmentChatBinding;
-import me.gavin.util.L;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
-import okio.ByteString;
 
 /**
  * 单聊 & 群聊
@@ -56,6 +53,7 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
 
     @Override
     protected void afterCreate(@Nullable Bundle savedInstanceState) {
+        subscribeEvent();
         mChatId = getArguments().getLong(BundleKey.CHAT_ID);
         mChatType = getArguments().getInt(BundleKey.CHAT_TYPE);
 
@@ -82,21 +80,32 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
                     mAdapter.notifyItemInserted(0);
                     mBinding.recycler.scrollToPosition(0);
 
-                    Message re = createMessageRe(msg.getContent());
-                    getDataLayer().getMessageService().insert(re);
-                    mMessageList.add(0, re);
-                    mAdapter.notifyItemInserted(0);
-                    mBinding.recycler.scrollToPosition(0);
-                    // TODO: 2018/2/3 发消息
-
-                    L.e(mWebSocket.send(msg.getContent()));
+                    RxBus.get().post(new SendMsgEvent(msg.getContent()));
                 }
                 return true;
             }
             return false;
         });
+    }
 
-        createWebSocket();
+    public void subscribeEvent() {
+        RxBus.get().toObservable(ReceiveMsgEvent.class)
+                .map(event -> event.message)
+//                .filter(msg -> msg.getChatType() == mChatType)
+//                .filter(msg -> msg.getChatId() == mChatId)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(mCompositeDisposable::add)
+                .subscribe(msg -> {
+                    mMessageList.add(0, msg);
+                    mAdapter.notifyItemInserted(0);
+                    mBinding.recycler.scrollToPosition(0);
+
+                    msg.setId(mChatId + "" + msg.getTime());
+                    msg.setChatId(mChatId);
+                    msg.setSender(mChatId);
+                    msg.setTime(mMessageList.get(1).getTime());
+                    getDataLayer().getMessageService().insert(msg);
+                });
     }
 
     @Override
@@ -120,71 +129,16 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
         return message;
     }
 
-    private Message createMessageRe(String content) {
-        long time = System.currentTimeMillis();
-        Message message = new Message();
-        message.setId(String.format("%s%s", mChatId, time));
-        message.setContent("Re:" + content);
-        message.setTime(time);
-        message.setSender(mChatId);
-        message.setChatId(mChatId);
-        message.setChatType(mChatType);
-
-        message.setName(mContact.getName());
-        message.setAvatar(mContact.getAvatar());
-        return message;
-    }
-
     private void getData() {
         getDataLayer().getMessageService()
                 .getMessage(mChatId, mChatType, 0)
                 .compose(RxTransformers.applySchedulers())
+                .compose(RxTransformers.log())
                 .subscribe(messages -> {
                     mMessageList.clear();
                     mMessageList.addAll(messages);
                     Collections.reverse(mMessageList);
                     mAdapter.notifyDataSetChanged();
                 }, throwable -> Snackbar.make(mBinding.recycler, throwable.getMessage(), Snackbar.LENGTH_LONG).show());
-    }
-
-    WebSocket mWebSocket;
-
-    private void createWebSocket() {
-        OkHttpClient client = new OkHttpClient.Builder().build();
-        mWebSocket = client.newWebSocket(new Request.Builder()
-                .url("ws://m.yy-happy.com/yy-app-web/websocket/socketServer.do")
-                .build(), new WebSocketListener() {
-            @Override
-            public void onOpen(WebSocket webSocket, Response response) {
-                L.e("onOpen - " + response);
-            }
-
-            @Override
-            public void onMessage(WebSocket webSocket, String text) {
-                L.e("onMessage - " + text);
-            }
-
-            @Override
-            public void onMessage(WebSocket webSocket, ByteString bytes) {
-                L.e("onMessageB - " + bytes);
-            }
-
-            @Override
-            public void onClosed(WebSocket webSocket, int code, String reason) {
-                L.e("onClosed - " + reason);
-            }
-
-            @Override
-            public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-                L.e("onFailure - " + t.getMessage());
-            }
-        });
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mWebSocket.send("END");
-        mWebSocket.close(1000, "close by me");
     }
 }

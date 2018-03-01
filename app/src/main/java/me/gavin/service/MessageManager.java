@@ -3,6 +3,7 @@ package me.gavin.service;
 import android.database.Cursor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -32,11 +33,12 @@ public class MessageManager extends BaseManager implements DataLayer.MessageServ
 
     @Override
     public Observable<List<Message>> getMessage(long chatId, int chatType, int offset) {
-        String sql = " SELECT * FROM MESSAGE LEFT JOIN CONTACT ON MESSAGE.SENDER = CONTACT._id WHERE MESSAGE.CHAT_ID = ? AND MESSAGE.CHAT_TYPE = ? LIMIT 30 OFFSET " + offset;
+        String sql = " SELECT * FROM MESSAGE LEFT JOIN CONTACT ON MESSAGE.SENDER = CONTACT._id WHERE MESSAGE.CHAT_ID = ? AND MESSAGE.CHAT_TYPE = ? ORDER BY MESSAGE.TIME DESC LIMIT 10 OFFSET " + offset;
         Cursor cursor = getDaoSession().getDatabase().rawQuery(sql, new String[]{String.valueOf(chatId), String.valueOf(chatType)});
         List<Message> result = new ArrayList<>();
         while (cursor.moveToNext()) {
             Message message = new Message(
+                    null,
                     cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Id.columnName)),
                     cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Content.columnName)),
                     cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Url.columnName)),
@@ -48,13 +50,15 @@ public class MessageManager extends BaseManager implements DataLayer.MessageServ
                     cursor.getLong(cursor.getColumnIndex(MessageDao.Properties.Time.columnName)),
                     cursor.getLong(cursor.getColumnIndex(MessageDao.Properties.Sender.columnName)),
                     cursor.getLong(cursor.getColumnIndex(MessageDao.Properties.ChatId.columnName)),
-                    cursor.getInt(cursor.getColumnIndex(MessageDao.Properties.ChatType.columnName))
+                    cursor.getInt(cursor.getColumnIndex(MessageDao.Properties.ChatType.columnName)),
+                    cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Extra.columnName))
             );
             message.setName(cursor.getString(cursor.getColumnIndex(ContactDao.Properties.Name.columnName)));
             message.setAvatar(cursor.getString(cursor.getColumnIndex(ContactDao.Properties.Avatar.columnName)));
             result.add(message);
         }
         cursor.close();
+        Collections.reverse(result);
         return Observable.just(result);
     }
 
@@ -85,11 +89,12 @@ public class MessageManager extends BaseManager implements DataLayer.MessageServ
     @Override
     public Observable<List<Message>> getChat() {
         // String sql = " SELECT * FROM MESSAGE WHERE TIME IN ( SELECT MAX ( TIME ) FROM MESSAGE GROUP BY CHAT_ID , CHAT_TYPE ) ORDER BY TIME DESC ";
-        String sql = " SELECT * FROM MESSAGE LEFT JOIN CONTACT ON MESSAGE.CHAT_ID = CONTACT._id WHERE MESSAGE.TIME IN ( SELECT MAX ( TIME ) FROM MESSAGE GROUP BY CHAT_ID , CHAT_TYPE ) ORDER BY MESSAGE.TIME DESC ";
+        String sql = " SELECT * FROM MESSAGE LEFT JOIN CONTACT ON MESSAGE.CHAT_ID = CONTACT._id WHERE MESSAGE.TIME IN ( SELECT MAX ( TIME ) FROM MESSAGE GROUP BY CHAT_ID , CHAT_TYPE ) GROUP BY CHAT_ID , CHAT_TYPE ORDER BY MESSAGE.TIME DESC ";
         Cursor cursor = getDaoSession().getDatabase().rawQuery(sql, null);
         List<Message> result = new ArrayList<>();
         while (cursor.moveToNext()) {
             Message message = new Message(
+                    null,
                     cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Id.columnName)),
                     cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Content.columnName)),
                     cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Url.columnName)),
@@ -101,7 +106,8 @@ public class MessageManager extends BaseManager implements DataLayer.MessageServ
                     cursor.getLong(cursor.getColumnIndex(MessageDao.Properties.Time.columnName)),
                     cursor.getLong(cursor.getColumnIndex(MessageDao.Properties.Sender.columnName)),
                     cursor.getLong(cursor.getColumnIndex(MessageDao.Properties.ChatId.columnName)),
-                    cursor.getInt(cursor.getColumnIndex(MessageDao.Properties.ChatType.columnName))
+                    cursor.getInt(cursor.getColumnIndex(MessageDao.Properties.ChatType.columnName)),
+                    cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Extra.columnName))
             );
             message.setName(cursor.getString(cursor.getColumnIndex(ContactDao.Properties.Name.columnName)));
             message.setAvatar(cursor.getString(cursor.getColumnIndex(ContactDao.Properties.Avatar.columnName)));

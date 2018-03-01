@@ -33,6 +33,10 @@
             </intent-filter>
         </activity>
 
+        <service
+            android:name="me.gavin.app.im.IMService"
+            android:exported="true" />
+
         <!-- 使用 okhttp3 加载图片 -->
         <meta-data
             android:name="me.gavin.util.glide.GlideQualityModule"

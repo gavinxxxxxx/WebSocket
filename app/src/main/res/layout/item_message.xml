@@ -52,7 +52,6 @@
             android:maxWidth="240dp"
             android:padding="8dp"
             android:textColor="@android:color/white"
-            android:visibility="@{ivLAvatar.getVisibility()}"
             app:layout_constraintStart_toEndOf="@+id/ivLAvatar"
             app:layout_constraintTop_toTopOf="@+id/ivLAvatar"
             tools:text="随风潜入夜，润物细无声" />
@@ -78,7 +77,6 @@
             android:maxWidth="240dp"
             android:padding="8dp"
             android:textColor="@android:color/white"
-            android:visibility="@{ivRAvatar.getVisibility()}"
             app:layout_constraintEnd_toStartOf="@+id/ivRAvatar"
             app:layout_constraintTop_toTopOf="@+id/ivRAvatar"
             tools:text="随风潜入夜，润物细无声" />
