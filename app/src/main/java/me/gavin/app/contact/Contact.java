@@ -21,7 +21,7 @@ public class Contact {
     private String name;
     @SerializedName(value = "nick", alternate = "nickName")
     private String nick;
-    @SerializedName("avatar")
+    @SerializedName(value = "avatar", alternate = "headImg")
     private String avatar;
 
     @Generated(hash = 668460499)

@@ -9,11 +9,13 @@ import com.google.gson.Gson;
 import javax.inject.Singleton;
 
 import dagger.Component;
+import me.gavin.app.im.IMService;
 import me.gavin.base.BaseActivity;
 import me.gavin.base.BaseFragment;
 import me.gavin.base.BaseViewModel;
 import me.gavin.inject.module.ApplicationModule;
 import me.gavin.service.base.BaseManager;
+import okhttp3.OkHttpClient;
 
 /**
  * ApplicationComponent
@@ -27,6 +29,8 @@ public interface ApplicationComponent {
     void inject(BaseActivity activity);
 
     void inject(BaseFragment fragment);
+
+    void inject(IMService service);
 
     void inject(BaseViewModel viewModel);
 

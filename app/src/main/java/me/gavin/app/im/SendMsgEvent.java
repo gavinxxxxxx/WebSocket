@@ -1,5 +1,7 @@
 package me.gavin.app.im;
 
+import me.gavin.app.message.Message;
+
 /**
  * 这里是萌萌哒注释君
  *
@@ -7,9 +9,9 @@ package me.gavin.app.im;
  */
 public class SendMsgEvent {
 
-    public String message;
+    public Message message;
 
-    public SendMsgEvent(String message) {
+    public SendMsgEvent(Message message) {
         this.message = message;
     }
 }

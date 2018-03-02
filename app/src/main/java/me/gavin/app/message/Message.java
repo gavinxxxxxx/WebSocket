@@ -1,5 +1,7 @@
 package me.gavin.app.message;
 
+import com.google.gson.annotations.Expose;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
@@ -20,12 +22,13 @@ public class Message {
 
     public static final int CHAT_TYPE_SINGLE = 0; // 单聊
     public static final int CHAT_TYPE_GROUP = 1; // 群聊
-    public static final int CHAT_TYPE_OFFICIAL = 2; // 官方账号 - 公众号
+    public static final int CHAT_TYPE_OFFICIAL = 10; // 官方账号 - 公众号
+    public static final int CHAT_TYPE_SYSTEM = 20; // 系统 - 通知等
 
-    public static final int CHAT_TYPE_CONTACT_ADD = 100; // 好友申请
-    public static final int CHAT_TYPE_CONTACT_DEL = 101; // 好友删除
+    public static final long SYSTEM_CONTACT_REQUEST = 0; // 好友请求
 
     @Id(autoincrement = true)
+    @Expose(serialize = false, deserialize = false)
     private Long _id; // id - 主键 自增 无意义
     @Unique
     private String id; // 消息 id - 发送时生成
@@ -38,19 +41,21 @@ public class Message {
     private int state; // 消息读取状态 0：未读 1：已读
     private long time; // 消息时间
     private long sender; // 消息发送人 id
-    private long chatId; // 会话 id - 群聊为群 id - 存储时生成
     private int chatType; // 会话类型 0：单聊 1：群聊 2：官方账号 3：...
+    private long chatId; // 会话 id - 群聊为群 id - 存储时生成
     private String extra; // 拓展 - json 字符串
 
     @Transient
+    @Expose(serialize = false, deserialize = false)
     private String name; // 消息发送人名字
     @Transient
-    private String avatar; // 消息发送人头像
+    @Expose(serialize = false, deserialize = false)
+    private transient String avatar; // 消息发送人头像
 
-    @Generated(hash = 566431938)
+    @Generated(hash = 1925179188)
     public Message(Long _id, String id, String content, String url, int width,
                    int height, long length, int type, int state, long time, long sender,
-                   long chatId, int chatType, String extra) {
+                   int chatType, long chatId, String extra) {
         this._id = _id;
         this.id = id;
         this.content = content;
@@ -62,8 +67,8 @@ public class Message {
         this.state = state;
         this.time = time;
         this.sender = sender;
-        this.chatId = chatId;
         this.chatType = chatType;
+        this.chatId = chatId;
         this.extra = extra;
     }
 
@@ -159,20 +164,20 @@ public class Message {
         this.sender = sender;
     }
 
-    public long getChatId() {
-        return this.chatId;
-    }
-
-    public void setChatId(long chatId) {
-        this.chatId = chatId;
-    }
-
     public int getChatType() {
         return this.chatType;
     }
 
     public void setChatType(int chatType) {
         this.chatType = chatType;
+    }
+
+    public long getChatId() {
+        return this.chatId;
+    }
+
+    public void setChatId(long chatId) {
+        this.chatId = chatId;
     }
 
     public String getExtra() {
@@ -182,7 +187,7 @@ public class Message {
     public void setExtra(String extra) {
         this.extra = extra;
     }
-
+    
     public String getName() {
         return name;
     }

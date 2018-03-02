@@ -40,7 +40,7 @@ public class MessageFragment extends BindingFragment<LayoutRecyclerBinding> {
         mBinding.recycler.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener(i -> {
             Message t = mMessageList.get(i);
-            ChatFragment fragment = ChatFragment.newInstance(t.getChatId(), t.getChatType());
+            ChatFragment fragment = ChatFragment.newInstance(t.getChatType(), t.getChatId());
             RxBus.get().post(new StartFragmentEvent(fragment));
         });
 

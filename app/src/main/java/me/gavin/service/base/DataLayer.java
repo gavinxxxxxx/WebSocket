@@ -7,6 +7,7 @@ import java.util.List;
 import io.reactivex.Observable;
 import me.gavin.app.account.User;
 import me.gavin.app.contact.Contact;
+import me.gavin.app.contact.Request;
 import me.gavin.app.message.Message;
 import me.gavin.net.Result;
 import okhttp3.ResponseBody;
@@ -51,7 +52,7 @@ public class DataLayer {
     }
 
     public interface MessageService {
-        Observable<List<Message>> getMessage(long chatId, int chatType, int offset);
+        Observable<List<Message>> getMessage(int chatType, long chatId, int offset);
 
         void insert(Message message);
 
@@ -59,6 +60,14 @@ public class DataLayer {
     }
 
     public interface ContactService {
+        Observable<Result<List<Contact>>> queryContact(String query);
+
+        Observable<Result> applyContact(long fid);
+
+        void insetRequest(Request request);
+
+        Observable<Result> dearContact(long fid, boolean apply);
+
         Observable<Contact> getContact(long id);
 
         Observable<List<Contact>> getContacts();
@@ -70,6 +79,8 @@ public class DataLayer {
         Observable<Result<User>> login(String account, String pwd);
 
         Observable<Result<User>> getUserInfo(String account);
+
+
     }
 
     public interface SettingService {

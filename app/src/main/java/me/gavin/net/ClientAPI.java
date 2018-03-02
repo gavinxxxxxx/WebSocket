@@ -2,8 +2,11 @@ package me.gavin.net;
 
 import com.google.gson.JsonArray;
 
+import java.util.List;
+
 import io.reactivex.Observable;
 import me.gavin.app.account.User;
+import me.gavin.app.contact.Contact;
 import okhttp3.ResponseBody;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -23,12 +26,7 @@ public interface ClientAPI {
 
 
     /* **************************************************************************** *
-     * *********************************** 知乎日报 ******************************** *
-     * **************************************************************************** */
-
-
-    /* **************************************************************************** *
-     * *********************************** 账号 ********************************** *
+     * *********************************** 账号 ************************************ *
      * **************************************************************************** */
 
     @FormUrlEncoded
@@ -43,8 +41,35 @@ public interface ClientAPI {
 
 
     /* **************************************************************************** *
+     * *********************************** 通讯录 ********************************** *
+     * **************************************************************************** */
+
+    @GET("friend/search")
+    Observable<Result<List<Contact>>> queryContact(@Query("name") String account);
+
+    @FormUrlEncoded
+    @POST("friend/applyAdd")
+    Observable<Result> applyContact(@Field("friendId") long fid);
+
+    @FormUrlEncoded
+    @POST("friend/pass")
+    Observable<Result> passContact(@Field("friendId") long fid);
+
+    @FormUrlEncoded
+    @POST("friend/refuse")
+    Observable<Result> refuseContact(@Field("friendId") long fid);
+
+
+    /* **************************************************************************** *
      * *********************************** 设置 ************************************ *
      * **************************************************************************** */
+
+    @FormUrlEncoded
+    @POST("upload/image")
+    Observable<Result> uploadImage(@Field("file") String imgBase64);
+
+    @POST("upload/file")
+    Observable<Result> uploadFile(@Field("file") String base64);
 
     @Streaming
     @GET

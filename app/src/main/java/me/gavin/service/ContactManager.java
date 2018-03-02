@@ -7,8 +7,10 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import me.gavin.app.contact.Contact;
+import me.gavin.app.contact.Request;
 import me.gavin.base.App;
 import me.gavin.base.RxTransformers;
+import me.gavin.net.Result;
 import me.gavin.service.base.BaseManager;
 import me.gavin.service.base.DataLayer;
 import me.gavin.util.AssetsUtils;
@@ -21,8 +23,33 @@ import me.gavin.util.AssetsUtils;
 public class ContactManager extends BaseManager implements DataLayer.ContactService {
 
     @Override
+    public Observable<Result<List<Contact>>> queryContact(String query) {
+        return getApi().queryContact(query);
+    }
+
+    @Override
+    public Observable<Result> applyContact(long fid) {
+        return getApi().applyContact(fid);
+    }
+
+    @Override
+    public void insetRequest(Request request) {
+        getDaoSession().getRequestDao()
+                .insert(request);
+    }
+
+    @Override
+    public Observable<Result> dearContact(long fid, boolean apply) {
+        return apply ? getApi().passContact(fid) : getApi().refuseContact(fid);
+    }
+
+    @Override
     public Observable<Contact> getContact(long id) {
-        return Observable.just(getDaoSession().getContactDao().load(id));
+        Contact contact = getDaoSession().getContactDao().load(id);
+        if (contact == null) {
+            return Observable.error(new NullPointerException("获取用户信息错误 - 用户不存在"));
+        }
+        return Observable.just(contact);
     }
 
     @Override

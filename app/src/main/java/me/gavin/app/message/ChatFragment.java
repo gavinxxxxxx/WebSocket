@@ -37,10 +37,10 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
     private final List<Message> mMessageList = new ArrayList<>();
     private ChatAdapter mAdapter;
 
-    public static ChatFragment newInstance(long chatId, int chatType) {
+    public static ChatFragment newInstance(int chatType, long chatId) {
         Bundle args = new Bundle();
-        args.putLong(BundleKey.CHAT_ID, chatId);
         args.putInt(BundleKey.CHAT_TYPE, chatType);
+        args.putLong(BundleKey.CHAT_ID, chatId);
         ChatFragment fragment = new ChatFragment();
         fragment.setArguments(args);
         return fragment;
@@ -80,7 +80,19 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
                     mAdapter.notifyItemInserted(0);
                     mBinding.recycler.scrollToPosition(0);
 
-                    RxBus.get().post(new SendMsgEvent(msg.getContent()));
+//                    Message re = new Message();
+//                    re.setId(String.format("%s%s", mChatId, msg.getTime()));
+//                    re.setContent("Re:" + msg.getContent());
+//                    re.setTime(msg.getTime());
+//                    re.setSender(mChatId);
+//                    re.setChatId(mChatId);
+//                    re.setChatType(mChatType);
+//                    getDataLayer().getMessageService().insert(re);
+//                    mMessageList.add(0, re);
+//                    mAdapter.notifyItemInserted(0);
+//                    mBinding.recycler.scrollToPosition(0);
+
+                    RxBus.get().post(new SendMsgEvent(msg));
                 }
                 return true;
             }
@@ -91,21 +103,15 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
     public void subscribeEvent() {
         RxBus.get().toObservable(ReceiveMsgEvent.class)
                 .map(event -> event.message)
-//                .filter(msg -> msg.getChatType() == mChatType)
-//                .filter(msg -> msg.getChatId() == mChatId)
+                .filter(msg -> msg.getChatType() == mChatType)
+                .filter(msg -> msg.getChatId() == mChatId)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(mCompositeDisposable::add)
                 .subscribe(msg -> {
                     mMessageList.add(0, msg);
                     mAdapter.notifyItemInserted(0);
                     mBinding.recycler.scrollToPosition(0);
-
-                    msg.setId(mChatId + "" + msg.getTime());
-                    msg.setChatId(mChatId);
-                    msg.setSender(mChatId);
-                    msg.setTime(mMessageList.get(1).getTime());
-                    getDataLayer().getMessageService().insert(msg);
-                });
+                }, Throwable::printStackTrace);
     }
 
     @Override
@@ -121,8 +127,8 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
         message.setContent(content);
         message.setTime(time);
         message.setSender(App.getUser().getId());
-        message.setChatId(mChatId);
         message.setChatType(mChatType);
+        message.setChatId(mChatId);
 
         message.setName(App.getUser().getName());
         message.setAvatar(App.getUser().getAvatar());
@@ -131,9 +137,8 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
 
     private void getData() {
         getDataLayer().getMessageService()
-                .getMessage(mChatId, mChatType, 0)
+                .getMessage(mChatType, mChatId, 0)
                 .compose(RxTransformers.applySchedulers())
-                .compose(RxTransformers.log())
                 .subscribe(messages -> {
                     mMessageList.clear();
                     mMessageList.addAll(messages);
