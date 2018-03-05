@@ -12,7 +12,9 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 import retrofit2.http.Streaming;
 import retrofit2.http.Url;
@@ -36,28 +38,31 @@ public interface ClientAPI {
     @GET("user/login")
     Observable<Result<User>> login(@Query("account") String account, @Query("pwd") String pwd);
 
-    @GET("user/getUserInfo")
+    @GET("user/info")
     Observable<Result<User>> getUserInfo(@Query("account") String account);
+
+    @PATCH("user/nickname")
+    Observable<Result> updateName(@Query("nickName") String value);
+
+    @PATCH("user/signature")
+    Observable<Result> updateSign(@Query("signature") String value);
 
 
     /* **************************************************************************** *
      * *********************************** 通讯录 ********************************** *
      * **************************************************************************** */
 
-    @GET("friend/search")
-    Observable<Result<List<Contact>>> queryContact(@Query("name") String account);
+    @GET("friend/search/{query}")
+    Observable<Result<List<Contact>>> queryContact(@Path("query") String query);
 
-    @FormUrlEncoded
-    @POST("friend/applyAdd")
-    Observable<Result> applyContact(@Field("friendId") long fid);
+    @POST("friend/{id}")
+    Observable<Result> applyContact(@Path("id") long fid);
 
-    @FormUrlEncoded
-    @POST("friend/pass")
-    Observable<Result> passContact(@Field("friendId") long fid);
+    @PATCH("friend/pass/{id}")
+    Observable<Result> passContact(@Path("id") long fid);
 
-    @FormUrlEncoded
-    @POST("friend/refuse")
-    Observable<Result> refuseContact(@Field("friendId") long fid);
+    @GET("friends")
+    Observable<Result<List<Contact>>> getContacts();
 
 
     /* **************************************************************************** *

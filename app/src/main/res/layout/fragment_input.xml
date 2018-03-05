@@ -12,10 +12,12 @@
             layout="@layout/layout_toolbar" />
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/inputLayoutAccount"
+            android:id="@+id/inputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginTop="100dp"
             android:theme="@style/TextLabel"
             app:layout_constraintBottom_toTopOf="@+id/inputLayoutPass"
@@ -25,7 +27,7 @@
             app:layout_constraintVertical_chainStyle="packed">
 
             <EditText
-                android:id="@+id/etAccount"
+                android:id="@+id/editText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="请输入账号"

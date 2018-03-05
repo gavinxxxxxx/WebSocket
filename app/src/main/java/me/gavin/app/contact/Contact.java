@@ -15,13 +15,13 @@ import org.greenrobot.greendao.annotation.Id;
 public class Contact {
 
     @Id
-    @SerializedName(value = "id", alternate = "userId")
+    @SerializedName(value = "id", alternate = {"userId", "friendId"})
     private Long id;
-    @SerializedName(value = "name", alternate = "account")
+    @SerializedName(value = "name", alternate = {"account", "friendAccount"})
     private String name;
-    @SerializedName(value = "nick", alternate = "nickName")
+    @SerializedName(value = "nick", alternate = {"nickName", "friendName"})
     private String nick;
-    @SerializedName(value = "avatar", alternate = "headImg")
+    @SerializedName(value = "avatar", alternate = {"headImg", "friendHeadImg"})
     private String avatar;
 
     @Generated(hash = 668460499)

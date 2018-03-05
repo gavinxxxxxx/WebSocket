@@ -25,7 +25,7 @@ public class Message {
     public static final int CHAT_TYPE_OFFICIAL = 10; // 官方账号 - 公众号
     public static final int CHAT_TYPE_SYSTEM = 20; // 系统 - 通知等
 
-    public static final long SYSTEM_CONTACT_REQUEST = 0; // 好友请求
+    public static final long SYSTEM_CONTACT_REQUEST = -1L; // 好友请求
 
     @Id(autoincrement = true)
     @Expose(serialize = false, deserialize = false)

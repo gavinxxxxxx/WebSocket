@@ -7,7 +7,7 @@
 
         <variable
             name="item"
-            type="me.gavin.app.contact.Contact" />
+            type="me.gavin.app.account.User" />
     </data>
 
     <android.support.v4.widget.NestedScrollView
@@ -47,7 +47,7 @@
                 android:id="@+id/flNice"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1dp"
+                android:layout_marginTop="1px"
                 android:background="@android:color/white"
                 android:foreground="?selectableItemBackground"
                 android:padding="@dimen/activity_horizontal_margin">
@@ -62,7 +62,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:text="@{item.name}"
+                    android:text="@{item.nick}"
                     tools:text="小明" />
 
             </FrameLayout>
@@ -71,7 +71,7 @@
                 android:id="@+id/flSignature"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1dp"
+                android:layout_marginTop="1px"
                 android:background="@android:color/white"
                 android:foreground="?selectableItemBackground"
                 android:padding="@dimen/activity_horizontal_margin">
@@ -86,7 +86,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:text="@{item.nick}"
+                    android:text="@{item.sign}"
                     tools:text="太阳当空照" />
 
             </FrameLayout>
@@ -101,6 +101,18 @@
                 android:layout_marginTop="56dp"
                 android:backgroundTint="@color/colorAccent"
                 android:text="退出登录"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/btnDebug"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="24dp"
+                android:backgroundTint="@color/colorAccent"
+                android:text="debug"
                 android:textColor="@android:color/white" />
 
         </LinearLayout>

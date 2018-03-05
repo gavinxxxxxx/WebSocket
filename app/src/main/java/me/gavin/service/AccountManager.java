@@ -27,4 +27,14 @@ public class AccountManager extends BaseManager implements DataLayer.AccountServ
     public Observable<Result<User>> getUserInfo(String account) {
         return getApi().getUserInfo(account);
     }
+
+    @Override
+    public Observable<Result> updateName(String value) {
+        return getApi().updateName(value);
+    }
+
+    @Override
+    public Observable<Result> updateSign(String value) {
+        return getApi().updateSign(value);
+    }
 }

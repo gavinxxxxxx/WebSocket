@@ -66,7 +66,9 @@ public class DataLayer {
 
         void insetRequest(Request request);
 
-        Observable<Result> dearContact(long fid, boolean apply);
+        Observable<List<Request>> getRequests();
+
+        Observable<Result> applyRequest(long fid);
 
         Observable<Contact> getContact(long id);
 
@@ -80,12 +82,16 @@ public class DataLayer {
 
         Observable<Result<User>> getUserInfo(String account);
 
+        Observable<Result> updateName(String value);
 
+        Observable<Result> updateSign(String value);
     }
 
     public interface SettingService {
         Observable<ResponseBody> download(String url);
 
         Observable<JsonArray> getLicense();
+
+        void debug();
     }
 }

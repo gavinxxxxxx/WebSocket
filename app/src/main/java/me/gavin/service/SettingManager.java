@@ -2,7 +2,11 @@ package me.gavin.service;
 
 import com.google.gson.JsonArray;
 
+import java.util.List;
+
 import io.reactivex.Observable;
+import me.gavin.app.message.Message;
+import me.gavin.db.dao.MessageDao;
 import me.gavin.service.base.BaseManager;
 import me.gavin.service.base.DataLayer;
 import okhttp3.ResponseBody;
@@ -22,5 +26,17 @@ public class SettingManager extends BaseManager implements DataLayer.SettingServ
     @Override
     public Observable<JsonArray> getLicense() {
         return getApi().getLicense();
+    }
+
+    @Override
+    public void debug() {
+//        List<Message> list = getDaoSession().getMessageDao()
+//                .queryBuilder()
+//                .where(MessageDao.Properties.ChatType.eq(Message.CHAT_TYPE_SYSTEM))
+//                .list();
+//        for (Message t : list) {
+//            t.setContent("某某某 请求加为好友");
+//        }
+//        getDaoSession().getMessageDao().updateInTx(list);
     }
 }

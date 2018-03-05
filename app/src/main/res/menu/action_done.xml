@@ -6,6 +6,7 @@
     <item
         android:id="@+id/action_done"
         android:icon="@drawable/vt_done_24dp"
-        android:title="完成" />
+        android:title="完成"
+        app:showAsAction="always" />
 
 </menu>

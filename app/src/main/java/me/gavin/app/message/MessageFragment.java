@@ -7,6 +7,7 @@ import android.support.design.widget.Snackbar;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.gavin.app.contact.RequestsFragment;
 import me.gavin.app.main.StartFragmentEvent;
 import me.gavin.base.BindingFragment;
 import me.gavin.base.RxBus;
@@ -38,11 +39,7 @@ public class MessageFragment extends BindingFragment<LayoutRecyclerBinding> {
     protected void afterCreate(@Nullable Bundle savedInstanceState) {
         mAdapter = new BindingAdapter<>(getContext(), mMessageList, R.layout.item_chat);
         mBinding.recycler.setAdapter(mAdapter);
-        mAdapter.setOnItemClickListener(i -> {
-            Message t = mMessageList.get(i);
-            ChatFragment fragment = ChatFragment.newInstance(t.getChatType(), t.getChatId());
-            RxBus.get().post(new StartFragmentEvent(fragment));
-        });
+        mAdapter.setOnItemClickListener(this::onItemClick);
 
         mBinding.refreshLayout.setOnRefreshListener(this::getData);
     }
@@ -68,5 +65,27 @@ public class MessageFragment extends BindingFragment<LayoutRecyclerBinding> {
                     mMessageList.addAll(messages);
                     mAdapter.notifyDataSetChanged();
                 }, throwable -> Snackbar.make(mBinding.recycler, throwable.getMessage(), Snackbar.LENGTH_LONG).show());
+    }
+
+    private void onItemClick(int position) {
+        Message t = mMessageList.get(position);
+        switch (t.getChatType()) {
+            case Message.CHAT_TYPE_SINGLE:
+            case Message.CHAT_TYPE_GROUP:
+            case Message.CHAT_TYPE_OFFICIAL:
+                ChatFragment fragment = ChatFragment.newInstance(t.getChatType(), t.getChatId());
+                RxBus.get().post(new StartFragmentEvent(fragment));
+                break;
+            case Message.CHAT_TYPE_SYSTEM:
+                onSystemClick(t);
+                break;
+        }
+    }
+
+    private void onSystemClick(Message t) {
+        if (t.getChatId() == Message.SYSTEM_CONTACT_REQUEST) {
+            RequestsFragment fragment = RequestsFragment.newInstance();
+            RxBus.get().post(new StartFragmentEvent(fragment));
+        }
     }
 }

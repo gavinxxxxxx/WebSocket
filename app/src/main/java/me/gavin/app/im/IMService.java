@@ -139,7 +139,7 @@ public class IMService extends Service {
                     long time = System.currentTimeMillis();
                     Message reqMsg = new Message();
                     reqMsg.setId(ttt.getFrom() + "" + time);
-                    reqMsg.setContent("窈窕淑女 君子好逑");
+                    reqMsg.setContent(String.format("%s 请求加为好友", req.getName()));
                     reqMsg.setTime(time);
                     reqMsg.setSender(ttt.getFrom());
                     reqMsg.setChatType(Message.CHAT_TYPE_SYSTEM);

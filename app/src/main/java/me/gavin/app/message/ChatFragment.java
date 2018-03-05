@@ -54,8 +54,8 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
     @Override
     protected void afterCreate(@Nullable Bundle savedInstanceState) {
         subscribeEvent();
-        mChatId = getArguments().getLong(BundleKey.CHAT_ID);
         mChatType = getArguments().getInt(BundleKey.CHAT_TYPE);
+        mChatId = getArguments().getLong(BundleKey.CHAT_ID);
 
         mBinding.includeToolbar.toolbar.setNavigationIcon(R.drawable.vt_arrow_back_24dp);
         mBinding.includeToolbar.toolbar.setNavigationOnClickListener(v -> pop());
@@ -64,7 +64,7 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
                 .compose(RxTransformers.applySchedulers())
                 .subscribe(contact -> {
                     mContact = contact;
-                    mBinding.includeToolbar.toolbar.setTitle(mContact.getName());
+                    mBinding.includeToolbar.toolbar.setTitle(mContact.getNick());
                 }, throwable -> Snackbar.make(mBinding.recycler, throwable.getMessage(), Snackbar.LENGTH_LONG).show());
 
         mAdapter = new ChatAdapter(getContext(), mMessageList);

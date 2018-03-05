@@ -31,13 +31,11 @@ public class MineFragment extends BindingFragment<FragmentMineBinding> {
 
     @Override
     protected void afterCreate(@Nullable Bundle savedInstanceState) {
-        mBinding.setItem(App.getUser());
-
         mBinding.flAvatar.setOnClickListener(v -> {
 
         });
         mBinding.flNice.setOnClickListener(v ->
-            RxBus.get().post(new StartFragmentEvent(InputFragment.newInstance(InputFragment.TYPE_NAME))));
+                RxBus.get().post(new StartFragmentEvent(InputFragment.newInstance(InputFragment.TYPE_NAME))));
         mBinding.flSignature.setOnClickListener(v ->
                 RxBus.get().post(new StartFragmentEvent(InputFragment.newInstance(InputFragment.TYPE_SIGN))));
 
@@ -46,5 +44,13 @@ public class MineFragment extends BindingFragment<FragmentMineBinding> {
             App.setUser(null);
             _mActivity.finish();
         });
+
+        mBinding.btnDebug.setOnClickListener(v -> getDataLayer().getSettingService().debug());
+    }
+
+    @Override
+    public void onSupportVisible() {
+        super.onSupportVisible();
+        mBinding.setItem(App.getUser());
     }
 }

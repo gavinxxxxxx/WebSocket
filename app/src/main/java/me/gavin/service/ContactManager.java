@@ -1,19 +1,17 @@
 package me.gavin.service;
 
-import com.google.gson.reflect.TypeToken;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
 import me.gavin.app.contact.Contact;
 import me.gavin.app.contact.Request;
+import me.gavin.app.message.Message;
 import me.gavin.base.App;
 import me.gavin.base.RxTransformers;
 import me.gavin.net.Result;
 import me.gavin.service.base.BaseManager;
 import me.gavin.service.base.DataLayer;
-import me.gavin.util.AssetsUtils;
+import me.gavin.util.L;
 
 /**
  * MessageManager
@@ -39,8 +37,13 @@ public class ContactManager extends BaseManager implements DataLayer.ContactServ
     }
 
     @Override
-    public Observable<Result> dearContact(long fid, boolean apply) {
-        return apply ? getApi().passContact(fid) : getApi().refuseContact(fid);
+    public Observable<List<Request>> getRequests() {
+        return Observable.just(getDaoSession().getRequestDao().loadAll());
+    }
+
+    @Override
+    public Observable<Result> applyRequest(long fid) {
+        return getApi().passContact(fid);
     }
 
     @Override
@@ -54,18 +57,40 @@ public class ContactManager extends BaseManager implements DataLayer.ContactServ
 
     @Override
     public Observable<List<Contact>> getContacts() {
-        return Observable.just("contacts.json")
-                .map(s -> AssetsUtils.readText(App.get(), s))
-                .map(s -> {
-                    List<Contact> contacts = getGson().fromJson(s, new TypeToken<ArrayList<Contact>>() {}.getType());
-                    for (int i = 0; i < contacts.size(); i++) {
-                        contacts.get(i).setId((long) i + 10000);
-                    }
+        return getApi().getContacts()
+                .compose(RxTransformers.filterResultCD())
+                .map(contacts -> {
                     contacts.add(0, App.getUser());
+                    contacts.add(0, new Contact(
+                            Message.SYSTEM_CONTACT_REQUEST,
+                            "好友申请",
+                            "新的朋友",
+                            "http://img2.3png.com/0c85b71fedcaca59bd4c60522d80fc527ae5.png"));
+
                     getDaoSession().getContactDao().deleteAll();
                     getDaoSession().getContactDao().insertInTx(contacts);
                     return getDaoSession().getContactDao().loadAll();
-                })
-                .compose(RxTransformers.log());
+                });
+
+//        return Observable.just("contacts.json")
+//                .map(s -> AssetsUtils.readText(App.get(), s))
+//                .map(s -> {
+//                    List<Contact> contacts = getGson().fromJson(s, new TypeToken<ArrayList<Contact>>() {}.getType());
+//                    for (int i = 0; i < contacts.size(); i++) {
+//                        contacts.get(i).setId((long) i + 10000);
+//                    }
+//                    contacts.add(0, App.getUser());
+//
+//                    contacts.add(0, new Contact(
+//                            Message.SYSTEM_CONTACT_REQUEST,
+//                            "好友申请",
+//                            "新的朋友",
+//                            "http://img2.3png.com/0c85b71fedcaca59bd4c60522d80fc527ae5.png"));
+//
+//                    getDaoSession().getContactDao().deleteAll();
+//                    getDaoSession().getContactDao().insertInTx(contacts);
+//                    return getDaoSession().getContactDao().loadAll();
+//                })
+//                .compose(RxTransformers.log());
     }
 }

@@ -1,5 +1,7 @@
 package me.gavin.app.account;
 
+import com.google.gson.annotations.SerializedName;
+
 import me.gavin.app.contact.Contact;
 
 /**
@@ -9,8 +11,18 @@ import me.gavin.app.contact.Contact;
  */
 public class User extends Contact {
 
+    @SerializedName("remark")
+    private String sign;
     private boolean logged;
     private String token;
+
+    public String getSign() {
+        return sign;
+    }
+
+    public void setSign(String sign) {
+        this.sign = sign;
+    }
 
     public boolean isLogged() {
         return logged;
