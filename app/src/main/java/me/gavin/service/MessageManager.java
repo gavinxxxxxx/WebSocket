@@ -24,7 +24,7 @@ public class MessageManager extends BaseManager implements DataLayer.MessageServ
 
     @Override
     public Observable<List<Message>> getMessage(int chatType, long chatId, int offset) {
-        String sql = " SELECT * FROM MESSAGE LEFT JOIN CONTACT ON MESSAGE.SENDER = CONTACT._id WHERE MESSAGE.CHAT_TYPE = ? AND MESSAGE.CHAT_ID = ? ORDER BY MESSAGE.TIME DESC, MESSAGE._id DESC LIMIT 10 OFFSET " + offset;
+        String sql = " SELECT * FROM MESSAGE LEFT JOIN CONTACT ON MESSAGE.SENDER = CONTACT.ID WHERE MESSAGE.CHAT_TYPE = ? AND MESSAGE.CHAT_ID = ? ORDER BY MESSAGE.TIME DESC, MESSAGE._id DESC LIMIT 10 OFFSET " + offset;
         Cursor cursor = getDaoSession().getDatabase().rawQuery(sql, new String[]{String.valueOf(chatType), String.valueOf(chatId)});
         List<Message> result = format(cursor);
         Collections.reverse(result);
@@ -38,7 +38,7 @@ public class MessageManager extends BaseManager implements DataLayer.MessageServ
 
     @Override
     public Observable<List<Message>> getChat() {
-        String sql = " SELECT * FROM MESSAGE LEFT JOIN CONTACT ON MESSAGE.CHAT_ID = CONTACT._id WHERE MESSAGE.TIME IN ( SELECT MAX ( TIME ) FROM MESSAGE GROUP BY CHAT_TYPE , CHAT_ID ) GROUP BY CHAT_TYPE , CHAT_ID ORDER BY MESSAGE.TIME DESC ";
+        String sql = " SELECT * FROM MESSAGE LEFT JOIN CONTACT ON MESSAGE.CHAT_ID = CONTACT.ID WHERE MESSAGE.TIME IN ( SELECT MAX ( TIME ) FROM MESSAGE GROUP BY CHAT_TYPE , CHAT_ID ) GROUP BY CHAT_TYPE , CHAT_ID ORDER BY MESSAGE.TIME DESC ";
         Cursor cursor = getDaoSession().getDatabase().rawQuery(sql, null);
         return Observable.just(format(cursor));
     }
@@ -62,7 +62,9 @@ public class MessageManager extends BaseManager implements DataLayer.MessageServ
                     cursor.getLong(cursor.getColumnIndex(MessageDao.Properties.ChatId.columnName)),
                     cursor.getString(cursor.getColumnIndex(MessageDao.Properties.Extra.columnName))
             );
-            msg.setName(cursor.getString(cursor.getColumnIndex(ContactDao.Properties.Nick.columnName)));
+            String nick = cursor.getString(cursor.getColumnIndex(ContactDao.Properties.Nick.columnName));
+            String name = cursor.getString(cursor.getColumnIndex(ContactDao.Properties.Name.columnName));
+            msg.setName(nick != null ? nick : name);
             msg.setAvatar(cursor.getString(cursor.getColumnIndex(ContactDao.Properties.Avatar.columnName)));
             result.add(msg);
         }

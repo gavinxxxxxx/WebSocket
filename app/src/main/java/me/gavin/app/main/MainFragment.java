@@ -8,13 +8,14 @@ import android.text.InputType;
 
 import me.gavin.app.contact.QueryContactFragment;
 import me.gavin.app.im.IMService;
+import me.gavin.base.App;
 import me.gavin.base.BindingFragment;
 import me.gavin.base.RxBus;
 import me.gavin.im.ws.R;
 import me.gavin.im.ws.databinding.FragmentMainBinding;
 
 /**
- * 这里是萌萌哒注释君
+ * 主页
  *
  * @author gavin.xiong 2018/2/3
  */
@@ -31,7 +32,7 @@ public class MainFragment extends BindingFragment<FragmentMainBinding> {
 
     @Override
     protected void afterCreate(@Nullable Bundle savedInstanceState) {
-        getActivity().startService(new Intent(getActivity(), IMService.class));
+        App.get().startService(new Intent(App.get(), IMService.class));
 
         mBinding.toolbar.inflateMenu(R.menu.action_search);
         SearchView searchView = (SearchView) mBinding.toolbar.getMenu().findItem(R.id.actionSearch).getActionView();
@@ -51,6 +52,12 @@ public class MainFragment extends BindingFragment<FragmentMainBinding> {
         });
 
         initViewPager();
+    }
+
+    @Override
+    public boolean onBackPressedSupport() {
+        getActivity().moveTaskToBack(false);
+        return true;
     }
 
     private void initViewPager() {

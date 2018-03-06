@@ -9,4 +9,5 @@ public class Config {
 
     public static String DB_NAME = "ws.db"; // 数据库名 - 用户id
 
+    public static String WS_URL = "ws://m.yy-happy.com/yy-app-web/websocket/socketServer.do"; // Web Socket 地址
 }

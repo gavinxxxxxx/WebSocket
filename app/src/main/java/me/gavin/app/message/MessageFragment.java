@@ -37,11 +37,11 @@ public class MessageFragment extends BindingFragment<LayoutRecyclerBinding> {
 
     @Override
     protected void afterCreate(@Nullable Bundle savedInstanceState) {
+        mBinding.refreshLayout.setEnabled(false);
+
         mAdapter = new BindingAdapter<>(getContext(), mMessageList, R.layout.item_chat);
         mBinding.recycler.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener(this::onItemClick);
-
-        mBinding.refreshLayout.setOnRefreshListener(this::getData);
     }
 
     @Override
@@ -54,12 +54,7 @@ public class MessageFragment extends BindingFragment<LayoutRecyclerBinding> {
         getDataLayer().getMessageService()
                 .getChat()
                 .compose(RxTransformers.applySchedulers())
-                .doOnSubscribe(disposable -> {
-                    mCompositeDisposable.add(disposable);
-                    mBinding.refreshLayout.setRefreshing(true);
-                })
-                .doOnComplete(() -> mBinding.refreshLayout.setRefreshing(false))
-                .doOnError(throwable -> mBinding.refreshLayout.setRefreshing(false))
+                .doOnSubscribe(mCompositeDisposable::add)
                 .subscribe(messages -> {
                     mMessageList.clear();
                     mMessageList.addAll(messages);

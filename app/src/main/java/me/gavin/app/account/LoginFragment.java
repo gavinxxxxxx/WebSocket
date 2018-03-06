@@ -52,6 +52,7 @@ public class LoginFragment extends BindingFragment<FragmentLoginBinding> {
                 .doOnSubscribe(mCompositeDisposable::add)
                 .subscribe(user -> {
                     user.setLogged(true);
+                    user.setName(user.getNick());
                     user.setAvatar("http://ww4.sinaimg.cn/large/6af89bc8gw1f8npye09jyj20f00drmys.jpg");
                     App.setUser(user);
                     startWithPop(MainFragment.newInstance());

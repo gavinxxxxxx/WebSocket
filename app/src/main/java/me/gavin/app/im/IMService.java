@@ -1,15 +1,18 @@
 package me.gavin.app.im;
 
+import android.annotation.TargetApi;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import com.google.gson.Gson;
-
-import java.util.Random;
 
 import javax.inject.Inject;
 
@@ -17,6 +20,7 @@ import dagger.Lazy;
 import io.reactivex.disposables.CompositeDisposable;
 import me.gavin.app.message.Message;
 import me.gavin.base.App;
+import me.gavin.base.Config;
 import me.gavin.base.RxBus;
 import me.gavin.inject.component.ApplicationComponent;
 import me.gavin.service.base.DataLayer;
@@ -42,23 +46,10 @@ public class IMService extends Service {
     protected Lazy<Gson> mGson;
     @Inject
     protected Lazy<DataLayer> mDataLayer;
-    @Inject
-    protected CompositeDisposable mCompositeDisposable;
 
-    WebSocket mWebSocket;
+    private CompositeDisposable mCompositeDisposable;
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        ApplicationComponent.Instance.get().inject(this);
-        createWebSocket();
-        subscribe();
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return START_STICKY;
-    }
+    private WebSocket mWebSocket;
 
     @Nullable
     @Override
@@ -67,26 +58,71 @@ public class IMService extends Service {
     }
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+        L.e("onCreate - " + System.currentTimeMillis() + " - " + this);
+        ApplicationComponent.Instance.get().inject(this);
+        mCompositeDisposable = new CompositeDisposable();
+        createWebSocket();
+        subscribe();
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            startForeground(0x250, new Notification.Builder(this).build());
+        } else {
+            createChannel();
+            startForeground(0x250, new Notification.Builder(this, "default").build());
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private void createChannel() {
+        NotificationChannel channel = new NotificationChannel("default",
+                "默认", NotificationManager.IMPORTANCE_DEFAULT);
+        channel.enableLights(true); //是否在桌面icon右上角展示小红点
+        channel.setLightColor(Color.GREEN); //小红点颜色
+        channel.setShowBadge(true); //是否在久按桌面图标时显示此渠道的通知
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.createNotificationChannel(channel);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        L.e("onStartCommand - " + System.currentTimeMillis() + " - " + this);
+        return START_STICKY;
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
+        L.e("onDestroy - " + System.currentTimeMillis() + " - " + this);
+        dispose();
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        L.e("onTaskRemoved - " + System.currentTimeMillis() + " - " + this);
+        dispose();
+    }
+
+    private void dispose() {
         mCompositeDisposable.dispose();
         if (mWebSocket != null) {
             mWebSocket.send("END");
             mWebSocket.close(1000, "close by me");
         }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            startService(new Intent(this, IMService.class));
+            startService(new Intent(App.get(), IMService.class));
         } else {
-            stopSelf();
+            startForegroundService(new Intent(App.get(), IMService.class));
         }
     }
 
     private void subscribe() {
         RxBus.get().toObservable(SendMsgEvent.class)
                 .map(event -> event.message)
-                // .doOnSubscribe(mCompositeDisposable::add)
+                .doOnSubscribe(mCompositeDisposable::add)
                 .subscribe(msg -> {
-                    L.d("onSend - " + msg.getContent());
                     String content = mGson.get().toJson(msg);
                     TTT ttt = new TTT();
                     ttt.setType("MSG");
@@ -100,14 +136,14 @@ public class IMService extends Service {
     }
 
     private void createWebSocket() {
-        if (App.getUser() == null || TextUtils.isEmpty(App.getUser().getToken())) {
+        if (App.getUser() == null || !App.getUser().isLogged()) {
             return;
         }
         Request request = new Request.Builder()
-                .url("ws://m.yy-happy.com/yy-app-web/websocket/socketServer.do")
-                .header("A-SID", App.getUser().getToken())
+                .url(Config.WS_URL)
                 .build();
-        mWebSocket = mOkHttpClient.get().newWebSocket(request, new MyWebSocketListener());
+        mWebSocket = mOkHttpClient.get()
+                .newWebSocket(request, new MyWebSocketListener());
     }
 
     private class MyWebSocketListener extends WebSocketListener {
@@ -160,38 +196,5 @@ public class IMService extends Service {
             L.e(TAG, "onFailure - " + t);
             createWebSocket();
         }
-    }
-
-    private Message getRe(String content) {
-        long time = System.currentTimeMillis();
-        long sender = 10000L + new Random(time).nextInt(200);
-        Message re = new Message();
-        re.setId(sender + "" + time);
-        re.setContent("他说" + content);
-        re.setTime(time);
-        re.setSender(sender);
-        re.setChatId(sender);
-        return re;
-    }
-
-    private String createMessageRe(String content) {
-        long time = System.currentTimeMillis();
-        long sender = App.getUser().getId();
-//         long chatId = 10000L + new Random(time).nextInt(200);
-        long chatId = sender;
-        Message t = new Message();
-        t.setId(sender + "" + time);
-        t.setContent(content);
-        t.setTime(time);
-        t.setSender(sender);
-        t.setChatId(chatId);
-        String json = mGson.get().toJson(t);
-
-        TTT ttt = new TTT();
-        ttt.setType("MSG");
-        ttt.setContent(json);
-        ttt.setFrom(sender);
-        ttt.setTo(chatId);
-        return mGson.get().toJson(ttt);
     }
 }

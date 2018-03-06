@@ -3,6 +3,11 @@ package me.gavin;
 import org.junit.Test;
 
 import java.lang.ref.WeakReference;
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Locale;
 
 import static org.junit.Assert.assertEquals;
 
@@ -39,7 +44,29 @@ public class ExampleUnitTest {
     public void integer() {
         System.out.println(Integer.MAX_VALUE);
         System.out.println(Integer.MAX_VALUE + 1);
-        System.out.println(Integer.MAX_VALUE +2);
+        System.out.println(Integer.MAX_VALUE + 2);
     }
 
+    @Test
+    public void soft() {
+        ArrayList<String> newArray = new ArrayList<>();
+        newArray.add("汽车");
+        newArray.add("ab12");
+        newArray.add("ab21");
+        newArray.add("公安");
+        newArray.add("怡");
+        newArray.add("张新");
+        newArray.add("广州");
+        newArray.add("test");
+        newArray.add("pp");
+        newArray.add("？23");
+        newArray.add(".23");
+
+        Collator col = Collator.getInstance(Locale.CHINESE);
+        Collections.sort(newArray, col);
+
+        for (String i : newArray) {
+            System.out.print(i + " ");
+        }
+    }
 }

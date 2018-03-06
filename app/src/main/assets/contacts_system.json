@@ -1,0 +1,16 @@
+[
+  {
+    "id": -1,
+    "type":20,
+    "account": "CONTACT_REQUEST",
+    "name": "新的朋友",
+    "avatar": "http://img2.3png.com/0c85b71fedcaca59bd4c60522d80fc527ae5.png"
+  },
+  {
+    "id": -2,
+    "type":20,
+    "account": "SYSTEM_NOTICE",
+    "name": "系统通知",
+    "avatar": "http://bpic.588ku.com/element_pic/01/40/47/72573d0083e0677.jpg"
+  }
+]
