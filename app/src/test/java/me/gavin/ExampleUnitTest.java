@@ -6,8 +6,13 @@ import java.lang.ref.WeakReference;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
+import io.reactivex.functions.Function;
 
 import static org.junit.Assert.assertEquals;
 
@@ -68,5 +73,29 @@ public class ExampleUnitTest {
         for (String i : newArray) {
             System.out.print(i + " ");
         }
+    }
+
+    @Test
+    public void soft2() {
+        ArrayList<Long> list = new ArrayList<>();
+        list.add(0L);
+        list.add(100L);
+        list.add(30L);
+        list.add(50L);
+        Collections.sort(list, (o1, o2) -> o1 > o2 ? -1 : 1);
+        for (Long t : list) {
+            System.out.println(t);
+        }
+    }
+
+    @Test
+    public void test2() {
+        Observable.create((ObservableOnSubscribe<String>) e -> {
+            System.out.println("subscribing");
+            e.onError(new RuntimeException("always fails"));
+        }).retryWhen(throwableObservable -> {
+            //这里可以发送新的被观察者 Observable
+            return throwableObservable.delay(2, TimeUnit.SECONDS).map(throwable -> 1);
+        }).subscribe(System.out::println);
     }
 }

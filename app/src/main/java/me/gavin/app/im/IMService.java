@@ -1,23 +1,24 @@
 package me.gavin.app.im;
 
-import android.annotation.TargetApi;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import dagger.Lazy;
+import io.reactivex.Observable;
+import io.reactivex.ObservableTransformer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import me.gavin.app.message.Message;
 import me.gavin.base.App;
 import me.gavin.base.Config;
@@ -25,11 +26,10 @@ import me.gavin.base.RxBus;
 import me.gavin.inject.component.ApplicationComponent;
 import me.gavin.service.base.DataLayer;
 import me.gavin.util.L;
+import me.gavin.util.NotificationHelper;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
 
 /**
  * 消息服务 - 收发消息
@@ -38,10 +38,13 @@ import okhttp3.WebSocketListener;
  */
 public class IMService extends Service {
 
-    public static final String TAG = "webSocket";
+    public static final String TAG = "WebSocket";
 
+    @Named("WebSocket")
     @Inject
     protected Lazy<OkHttpClient> mOkHttpClient;
+    @Inject
+    protected Lazy<IWebSocketListener> mListener;
     @Inject
     protected Lazy<Gson> mGson;
     @Inject
@@ -62,33 +65,22 @@ public class IMService extends Service {
         super.onCreate();
         L.e("onCreate - " + System.currentTimeMillis() + " - " + this);
         ApplicationComponent.Instance.get().inject(this);
-        mCompositeDisposable = new CompositeDisposable();
-        createWebSocket();
-        subscribe();
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            startForeground(0x250, new Notification.Builder(this).build());
-        } else {
-            createChannel();
-            startForeground(0x250, new Notification.Builder(this, "default").build());
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.O)
-    private void createChannel() {
-        NotificationChannel channel = new NotificationChannel("default",
-                "默认", NotificationManager.IMPORTANCE_DEFAULT);
-        channel.enableLights(true); //是否在桌面icon右上角展示小红点
-        channel.setLightColor(Color.GREEN); //小红点颜色
-        channel.setShowBadge(true); //是否在久按桌面图标时显示此渠道的通知
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.createNotificationChannel(channel);
+        // startForeground(-99, NotificationHelper.newNotificationBuilder(this).build());
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         L.e("onStartCommand - " + System.currentTimeMillis() + " - " + this);
-        return START_STICKY;
+        if (mCompositeDisposable != null) {
+            mCompositeDisposable.dispose();
+        }
+        if (mWebSocket != null) {
+            mWebSocket.close(1000, "close by me");
+        }
+        mCompositeDisposable = new CompositeDisposable();
+        createWebSocket();
+        subscribe();
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? START_STICKY : START_NOT_STICKY;
     }
 
     @Override
@@ -106,15 +98,16 @@ public class IMService extends Service {
     }
 
     private void dispose() {
-        mCompositeDisposable.dispose();
+        if (mCompositeDisposable != null) {
+            mCompositeDisposable.dispose();
+        }
         if (mWebSocket != null) {
-            mWebSocket.send("END");
             mWebSocket.close(1000, "close by me");
         }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             startService(new Intent(App.get(), IMService.class));
         } else {
-            startForegroundService(new Intent(App.get(), IMService.class));
+            // startForegroundService(new Intent(App.get(), IMService.class));
         }
     }
 
@@ -139,62 +132,84 @@ public class IMService extends Service {
         if (App.getUser() == null || !App.getUser().isLogged()) {
             return;
         }
-        Request request = new Request.Builder()
-                .url(Config.WS_URL)
-                .build();
-        mWebSocket = mOkHttpClient.get()
-                .newWebSocket(request, new MyWebSocketListener());
+        toObservable()
+//                .compose(retryWhen())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(d -> {
+                    mCompositeDisposable.add(d);
+                    Request request = new Request.Builder().url(Config.WS_URL).build();
+                    mWebSocket = mOkHttpClient.get().newWebSocket(request, mListener.get());
+                })
+                .subscribe(s -> {
+                    L.e("onNext - " + s);
+                    handleMessage(s);
+                }, throwable -> {
+                    L.e("onError - " + throwable);
+                    throwable.printStackTrace();
+                }, () -> {
+                    L.e("onComplete - ");
+                });
     }
 
-    private class MyWebSocketListener extends WebSocketListener {
-        @Override
-        public void onOpen(WebSocket webSocket, Response response) {
-            L.e(TAG, "onOpen - " + response);
-        }
+    /**
+     * 断线重连
+     */
+    public <T> ObservableTransformer<T, T> retryWhen() {
+        return upstream -> upstream
+                .retryWhen(throwableObservable -> throwableObservable
+                        .delay(1, TimeUnit.SECONDS)
+                        .map(t -> 0))
+                .repeatWhen(objectObservable -> objectObservable
+                        .delay(1, TimeUnit.SECONDS)
+                        .map(o -> 0));
+    }
 
-        @Override
-        public void onMessage(WebSocket webSocket, String text) {
-            L.d(TAG, "onMessage - " + text);
-            TTT ttt = mGson.get().fromJson(text, TTT.class);
-            switch (ttt.getType()) {
-                case "MSG":
-                    Message msg = mGson.get().fromJson(ttt.getContent(), Message.class);
-                    if (msg.getChatType() == Message.CHAT_TYPE_SINGLE
-                            && msg.getSender() == msg.getChatId()) { // 自己发的单聊消息不接收
-                        return;
-                    }
-                    msg.setChatId(msg.getSender());
-                    mDataLayer.get().getMessageService().insert(msg);
-                    RxBus.get().post(new ReceiveMsgEvent(msg));
-                    break;
-                case "ADD_FRIEND":
-                    me.gavin.app.contact.Request req = mGson.get().fromJson(ttt.getContent(), me.gavin.app.contact.Request.class);
-                    req.setUid(ttt.getFrom());
-                    mDataLayer.get().getContactService().insetRequest(req);
+    private Observable<String> toObservable() {
+        L.e("toObservable - " + System.currentTimeMillis());
+        return Observable.defer(() -> {
+            return mListener.get().getObservable();
+        });
+    }
 
-                    long time = System.currentTimeMillis();
-                    Message reqMsg = new Message();
-                    reqMsg.setId(ttt.getFrom() + "" + time);
-                    reqMsg.setContent(String.format("%s 请求加为好友", req.getName()));
-                    reqMsg.setTime(time);
-                    reqMsg.setSender(ttt.getFrom());
-                    reqMsg.setChatType(Message.CHAT_TYPE_SYSTEM);
-                    reqMsg.setChatId(Message.SYSTEM_CONTACT_REQUEST);
-                    mDataLayer.get().getMessageService().insert(reqMsg);
-                    break;
-            }
-        }
+    public void handleMessage(String text) {
+        TTT ttt = mGson.get().fromJson(text, TTT.class);
+        switch (ttt.getType()) {
+            case "MSG":
+                Message msg = mGson.get().fromJson(ttt.getContent(), Message.class);
+                if (msg.getChatType() == Message.CHAT_TYPE_SINGLE
+                        && msg.getSender() == msg.getChatId()) { // 自己发的单聊消息不接收
+                    return;
+                }
+                msg.setChatId(msg.getSender());
+                mDataLayer.get().getMessageService().insert(msg);
+                RxBus.get().post(new ReceiveMsgEvent(msg));
 
-        @Override
-        public void onClosed(WebSocket webSocket, int code, String reason) {
-            L.e(TAG, "onClosed - " + code + " - " + reason);
-            createWebSocket();
-        }
+                mDataLayer.get().getContactService()
+                        .getContact(msg.getSender())
+                        .doOnSubscribe(mCompositeDisposable::add)
+                        .subscribe(contact -> {
+                            String name = contact.getNick() != null ? contact.getNick() : contact.getName();
+                            NotificationHelper.notify(App.get(), name, msg.getContent(), msg.getContent(), null);
+                        }, throwable -> {
+                            NotificationHelper.notify(App.get(), String.valueOf(msg.getSender()), msg.getContent(), msg.getContent(), null);
+                        });
+                break;
+            case "ADD_FRIEND":
+                me.gavin.app.contact.Request req = mGson.get().fromJson(ttt.getContent(), me.gavin.app.contact.Request.class);
+                req.setUid(ttt.getFrom());
+                mDataLayer.get().getContactService().insetRequest(req);
 
-        @Override
-        public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-            L.e(TAG, "onFailure - " + t);
-            createWebSocket();
+                long time = System.currentTimeMillis();
+                Message reqMsg = new Message();
+                reqMsg.setId(ttt.getFrom() + "" + time);
+                reqMsg.setContent(String.format("%s 请求加为好友", req.getName()));
+                reqMsg.setTime(time);
+                reqMsg.setSender(ttt.getFrom());
+                reqMsg.setChatType(Message.CHAT_TYPE_SYSTEM);
+                reqMsg.setChatId(Message.SYSTEM_CONTACT_REQUEST);
+                mDataLayer.get().getMessageService().insert(reqMsg);
+                break;
         }
     }
 }

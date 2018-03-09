@@ -1,9 +1,8 @@
 package me.gavin.service;
 
-import android.icu.text.Collator;
-
 import com.google.gson.reflect.TypeToken;
 
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;

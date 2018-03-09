@@ -15,7 +15,6 @@ import me.gavin.base.BaseFragment;
 import me.gavin.base.BaseViewModel;
 import me.gavin.inject.module.ApplicationModule;
 import me.gavin.service.base.BaseManager;
-import okhttp3.OkHttpClient;
 
 /**
  * ApplicationComponent

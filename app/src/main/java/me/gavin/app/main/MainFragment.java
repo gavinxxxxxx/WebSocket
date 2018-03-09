@@ -1,12 +1,18 @@
 package me.gavin.app.main;
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.SearchView;
 import android.text.InputType;
 
 import me.gavin.app.contact.QueryContactFragment;
+import me.gavin.app.im.IMJobService;
 import me.gavin.app.im.IMService;
 import me.gavin.base.App;
 import me.gavin.base.BindingFragment;
@@ -33,6 +39,16 @@ public class MainFragment extends BindingFragment<FragmentMainBinding> {
     @Override
     protected void afterCreate(@Nullable Bundle savedInstanceState) {
         App.get().startService(new Intent(App.get(), IMService.class));
+
+        ComponentName serviceName = new ComponentName(getContext(), IMJobService.class);
+        JobInfo.Builder builder = new JobInfo.Builder(0x253, serviceName);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            builder.setPeriodic(15 * 60 * 1000);
+        } else {
+            builder.setPeriodic(5 * 60 * 1000);
+        }
+        JobScheduler jobScheduler = (JobScheduler) getContext().getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        jobScheduler.schedule(builder.build());
 
         mBinding.toolbar.inflateMenu(R.menu.action_search);
         SearchView searchView = (SearchView) mBinding.toolbar.getMenu().findItem(R.id.actionSearch).getActionView();

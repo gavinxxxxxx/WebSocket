@@ -113,7 +113,6 @@ dependencies {
     androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-
     implementation rootProject.ext.libSupportAppcompat
     implementation rootProject.ext.libSupportDesign
     implementation rootProject.ext.libSupportRecyclerView
@@ -122,33 +121,24 @@ dependencies {
     //    compile rootProject.ext.libSupportVectorDrawable
     //    compile rootProject.ext.libSupportPalette
     //    compile rootProject.ext.libSupportPercent
-
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-
     implementation rootProject.ext.libFragmentation
-
     implementation rootProject.ext.libRxJava
     implementation rootProject.ext.libRxAndroid
     implementation rootProject.ext.libRxPermissions
-
     implementation rootProject.ext.libRetrofit
     implementation rootProject.ext.libRetrofitConverterGson
     implementation rootProject.ext.libRetrofitAdapterRxJava
-
     implementation rootProject.ext.libGson
-
     implementation rootProject.ext.libOkHttp
     implementation rootProject.ext.libOkHttpLoggingInterceptor
-
     implementation rootProject.ext.libDagger
     annotationProcessor rootProject.ext.libDaggerCompiler
-
     implementation rootProject.ext.libShapedImageView
-
     implementation rootProject.ext.libGlide
     implementation rootProject.ext.libGlideOkhttp3Integration
-
     implementation rootProject.ext.libPhotoView
-
     implementation rootProject.ext.libGreenDao
+    implementation 'com.dhh:websocket2:1.5.0'
+    implementation project(':daemon')
 }

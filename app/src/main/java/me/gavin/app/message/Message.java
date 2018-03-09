@@ -1,12 +1,11 @@
 package me.gavin.app.message;
 
-import com.google.gson.annotations.Expose;
-
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
-import org.greenrobot.greendao.annotation.Transient;
 import org.greenrobot.greendao.annotation.Unique;
+
+import me.gavin.util.gson.JsonIgnore;
 
 /**
  * 消息
@@ -27,8 +26,8 @@ public class Message {
 
     public static final long SYSTEM_CONTACT_REQUEST = -1L; // 好友请求
 
+    @JsonIgnore
     @Id(autoincrement = true)
-    @Expose(serialize = false, deserialize = false)
     private Long _id; // id - 主键 自增 无意义
     @Unique
     private String id; // 消息 id - 发送时生成
@@ -45,17 +44,13 @@ public class Message {
     private long chatId; // 会话 id - 群聊为群 id - 存储时生成
     private String extra; // 拓展 - json 字符串
 
-    @Transient
-    @Expose(serialize = false, deserialize = false)
-    private String name; // 消息发送人名字
-    @Transient
-    @Expose(serialize = false, deserialize = false)
+    private transient String name; // 消息发送人名字
     private transient String avatar; // 消息发送人头像
 
     @Generated(hash = 1925179188)
-    public Message(Long _id, String id, String content, String url, int width,
-                   int height, long length, int type, int state, long time, long sender,
-                   int chatType, long chatId, String extra) {
+    public Message(Long _id, String id, String content, String url, int width, int height,
+                   long length, int type, int state, long time, long sender, int chatType,
+                   long chatId, String extra) {
         this._id = _id;
         this.id = id;
         this.content = content;
@@ -187,7 +182,7 @@ public class Message {
     public void setExtra(String extra) {
         this.extra = extra;
     }
-    
+
     public String getName() {
         return name;
     }

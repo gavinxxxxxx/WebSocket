@@ -17,6 +17,7 @@ import dagger.Provides;
         DatabaseModule.class,
         SharedPreferencesModule.class,
         ClientAPIModule.class,
+        WebSocketModule.class,
         CompositeDisposableModule.class
 })
 public class ApplicationModule {

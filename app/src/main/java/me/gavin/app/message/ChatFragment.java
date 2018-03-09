@@ -64,7 +64,7 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
                 .compose(RxTransformers.applySchedulers())
                 .subscribe(contact -> {
                     mContact = contact;
-                    mBinding.includeToolbar.toolbar.setTitle(mContact.getNick());
+                    mBinding.includeToolbar.toolbar.setTitle(mContact.getNick() != null ? mContact.getNick() : mContact.getName());
                 }, throwable -> Snackbar.make(mBinding.recycler, throwable.getMessage(), Snackbar.LENGTH_LONG).show());
 
         mAdapter = new ChatAdapter(getContext(), mMessageList);
@@ -79,19 +79,6 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
                     mMessageList.add(0, msg);
                     mAdapter.notifyItemInserted(0);
                     mBinding.recycler.scrollToPosition(0);
-
-//                    Message re = new Message();
-//                    re.setId(String.format("%s%s", mChatId, msg.getTime()));
-//                    re.setContent("Re:" + msg.getContent());
-//                    re.setTime(msg.getTime());
-//                    re.setSender(mChatId);
-//                    re.setChatId(mChatId);
-//                    re.setChatType(mChatType);
-//                    getDataLayer().getMessageService().insert(re);
-//                    mMessageList.add(0, re);
-//                    mAdapter.notifyItemInserted(0);
-//                    mBinding.recycler.scrollToPosition(0);
-
                     RxBus.get().post(new SendMsgEvent(msg));
                 }
                 return true;

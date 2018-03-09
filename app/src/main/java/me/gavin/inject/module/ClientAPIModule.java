@@ -16,7 +16,8 @@ import me.gavin.im.ws.BuildConfig;
 import me.gavin.net.ClientAPI;
 import me.gavin.net.interceptor.HeaderInterceptor;
 import me.gavin.util.CacheHelper;
-import me.gavin.util.L;
+import me.gavin.util.gson.DeserializationExclusionStrategy;
+import me.gavin.util.gson.SerializationExclusionStrategy;
 import me.gavin.util.okhttp.OKHttpCacheInterceptor;
 import me.gavin.util.okhttp.OKHttpCacheNetworkInterceptor;
 import me.gavin.util.okhttp.OKHttpLoggingInterceptor;
@@ -36,7 +37,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @Module
 public class ClientAPIModule {
 
-    private static final String BASE_URL = "http://m.yy-happy.com/yy-app-web/api/";
+    private static final String BASE_URL = "http://app.yy-happy.com/api/";
 
     /**
      * 创建一个ClientAPI的实现类单例对象
@@ -48,7 +49,6 @@ public class ClientAPIModule {
     @Singleton
     @Provides
     ClientAPI provideClientApi(OkHttpClient client, Converter.Factory converterFactory) {
-        L.e("provideClientApi");
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(converterFactory)
@@ -79,14 +79,8 @@ public class ClientAPIModule {
     @Provides
     Gson provideGson() {
         return new GsonBuilder()
-//                .excludeFieldsWithoutExposeAnnotation() //不导出实体中没有用@Expose注解的属性
-//                .enableComplexMapKeySerialization() //支持Map的key为复杂对象的形式
-//                .setDateFormat("yyyy-MM-dd HH:mm:ss:SSS")//时间转化为特定格式
-//                .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)//会把字段首字母大写,注:对于实体上使用了@SerializedName注解的不会生效.
-//                .setPrettyPrinting() //对json结果格式化.
-//                .setVersion(1.0)
-//                .disableHtmlEscaping()//默认是GSON把HTML 转义的，但也可以设置不转义
-//                .serializeNulls()//把null值也转换，默认是不转换null值的，可以选择也转换,为空时输出为{a:null}，而不是{}
+                .addSerializationExclusionStrategy(new SerializationExclusionStrategy())
+                .addDeserializationExclusionStrategy(new DeserializationExclusionStrategy())
                 .create();
     }
 

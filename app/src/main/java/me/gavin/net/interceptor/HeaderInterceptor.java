@@ -2,6 +2,7 @@ package me.gavin.net.interceptor;
 
 import java.io.IOException;
 
+import me.gavin.app.account.User;
 import me.gavin.base.App;
 import okhttp3.Interceptor;
 import okhttp3.Response;
@@ -18,7 +19,14 @@ public class HeaderInterceptor implements Interceptor {
         if (App.getUser() == null) return chain.proceed(chain.request());
         return chain.proceed(chain.request()
                 .newBuilder()
-                .addHeader("A-SID", App.getUser().getToken())
+                .header("A-SID", getToken())
                 .build());
+    }
+
+    private String getToken() {
+        User user = App.getUser();
+        return user != null && user.getToken() != null
+                ? user.getToken()
+                : "";
     }
 }

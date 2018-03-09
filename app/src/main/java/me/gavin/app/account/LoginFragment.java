@@ -56,7 +56,10 @@ public class LoginFragment extends BindingFragment<FragmentLoginBinding> {
                     user.setAvatar("http://ww4.sinaimg.cn/large/6af89bc8gw1f8npye09jyj20f00drmys.jpg");
                     App.setUser(user);
                     startWithPop(MainFragment.newInstance());
-                }, throwable -> Snackbar.make(mBinding.btnRegister, throwable.getMessage(), Snackbar.LENGTH_LONG).show());
+                }, throwable -> {
+                    throwable.printStackTrace();
+                    Snackbar.make(mBinding.btnRegister, throwable.getMessage(), Snackbar.LENGTH_LONG).show();
+                });
     }
 
     private void doRegister() {
@@ -68,6 +71,9 @@ public class LoginFragment extends BindingFragment<FragmentLoginBinding> {
                 .compose(RxTransformers.applySchedulers())
                 .doOnSubscribe(mCompositeDisposable::add)
                 .subscribe(result -> doLogin(),
-                        throwable -> Snackbar.make(mBinding.btnRegister, throwable.getMessage(), Snackbar.LENGTH_LONG).show());
+                        throwable -> {
+                            throwable.printStackTrace();
+                            Snackbar.make(mBinding.btnRegister, throwable.toString(), Snackbar.LENGTH_LONG).show();
+                        });
     }
 }

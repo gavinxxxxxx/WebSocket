@@ -1,8 +1,11 @@
 package me.gavin.base;
 
 import android.app.Application;
+import android.content.Intent;
+import android.content.IntentFilter;
 
 import me.gavin.app.account.User;
+import me.gavin.app.daemon.ScreenBroadcastReceiver;
 import me.gavin.inject.component.ApplicationComponent;
 import me.gavin.inject.component.DaggerApplicationComponent;
 import me.gavin.inject.module.ApplicationModule;
@@ -24,6 +27,13 @@ public class App extends Application {
                 .getGson().fromJson(ApplicationComponent.Instance.get()
                         .getSharedPreferences()
                         .getString(BundleKey.USER, ""), User.class));
+
+//        ScreenBroadcastReceiver mScreenReceiver = new ScreenBroadcastReceiver();
+//        IntentFilter filter = new IntentFilter();
+//        filter.addAction(Intent.ACTION_SCREEN_ON);
+//        filter.addAction(Intent.ACTION_SCREEN_OFF);
+//        filter.addAction(Intent.ACTION_USER_PRESENT);
+//        registerReceiver(mScreenReceiver, filter);
     }
 
     private void initDagger() {
