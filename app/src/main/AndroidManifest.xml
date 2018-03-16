@@ -37,9 +37,9 @@
             android:name="me.gavin.app.im.IMService"
             android:exported="true" />
 
-        <service
-            android:name="me.gavin.app.im.IMJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <!--<service-->
+        <!--android:name="me.gavin.app.im.IMJobService"-->
+        <!--android:permission="android.permission.BIND_JOB_SERVICE" />-->
 
         <!-- 使用 okhttp3 加载图片 -->
         <meta-data

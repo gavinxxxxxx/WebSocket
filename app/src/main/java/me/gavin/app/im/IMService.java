@@ -16,9 +16,7 @@ import javax.inject.Named;
 import dagger.Lazy;
 import io.reactivex.Observable;
 import io.reactivex.ObservableTransformer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 import me.gavin.app.message.Message;
 import me.gavin.base.App;
 import me.gavin.base.Config;
@@ -29,7 +27,9 @@ import me.gavin.util.L;
 import me.gavin.util.NotificationHelper;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
 import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
 
 /**
  * 消息服务 - 收发消息
@@ -65,7 +65,7 @@ public class IMService extends Service {
         super.onCreate();
         L.e("onCreate - " + System.currentTimeMillis() + " - " + this);
         ApplicationComponent.Instance.get().inject(this);
-        // startForeground(-99, NotificationHelper.newNotificationBuilder(this).build());
+        startForeground(-99, NotificationHelper.newNotificationBuilder(this).build());
     }
 
     @Override
@@ -80,7 +80,18 @@ public class IMService extends Service {
         mCompositeDisposable = new CompositeDisposable();
         createWebSocket();
         subscribe();
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? START_STICKY : START_NOT_STICKY;
+        // return Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? START_STICKY : START_NOT_STICKY;
+        return START_STICKY;
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
     }
 
     @Override
@@ -107,7 +118,7 @@ public class IMService extends Service {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             startService(new Intent(App.get(), IMService.class));
         } else {
-            // startForegroundService(new Intent(App.get(), IMService.class));
+            startForegroundService(new Intent(App.get(), IMService.class));
         }
     }
 
@@ -132,24 +143,29 @@ public class IMService extends Service {
         if (App.getUser() == null || !App.getUser().isLogged()) {
             return;
         }
-        toObservable()
-//                .compose(retryWhen())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(d -> {
-                    mCompositeDisposable.add(d);
-                    Request request = new Request.Builder().url(Config.WS_URL).build();
-                    mWebSocket = mOkHttpClient.get().newWebSocket(request, mListener.get());
-                })
-                .subscribe(s -> {
-                    L.e("onNext - " + s);
-                    handleMessage(s);
-                }, throwable -> {
-                    L.e("onError - " + throwable);
-                    throwable.printStackTrace();
-                }, () -> {
-                    L.e("onComplete - ");
-                });
+        mWebSocket = mOkHttpClient.get()
+                .newWebSocket(new Request.Builder()
+                        .url(Config.WS_URL)
+                        .build(), new MyWebSocketListener());
+
+//        toObservable()
+////                .compose(retryWhen())
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .doOnSubscribe(d -> {
+//                    mCompositeDisposable.add(d);
+//                    Request request = new Request.Builder().url(Config.WS_URL).build();
+//                    mWebSocket = mOkHttpClient.get().newWebSocket(request, mListener.get());
+//                })
+//                .subscribe(s -> {
+//                    L.e("onNext - " + s);
+//                    handleMessage(s);
+//                }, throwable -> {
+//                    L.e("onError - " + throwable);
+//                    throwable.printStackTrace();
+//                }, () -> {
+//                    L.e("onComplete - ");
+//                });
     }
 
     /**
@@ -210,6 +226,31 @@ public class IMService extends Service {
                 reqMsg.setChatId(Message.SYSTEM_CONTACT_REQUEST);
                 mDataLayer.get().getMessageService().insert(reqMsg);
                 break;
+        }
+    }
+
+    private class MyWebSocketListener extends WebSocketListener {
+        @Override
+        public void onOpen(WebSocket webSocket, Response response) {
+            L.e(TAG, "onOpen - " + response);
+        }
+
+        @Override
+        public void onMessage(WebSocket webSocket, String text) {
+            L.d(TAG, "onMessage - " + text);
+            handleMessage(text);
+        }
+
+        @Override
+        public void onClosed(WebSocket webSocket, int code, String reason) {
+            L.e(TAG, "onClosed - " + code + " - " + reason + " - ");
+            createWebSocket();
+        }
+
+        @Override
+        public void onFailure(WebSocket webSocket, Throwable t, @Nullable Response response) {
+            L.e(TAG, "onFailure - " + t);
+            createWebSocket();
         }
     }
 }

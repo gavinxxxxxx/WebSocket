@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 
+import java.net.HttpURLConnection;
+
 import me.gavin.app.main.MainFragment;
 import me.gavin.base.App;
 import me.gavin.base.BindingFragment;
@@ -45,7 +47,8 @@ public class LoginFragment extends BindingFragment<FragmentLoginBinding> {
                 .compose(RxTransformers.filterResultCD())
                 .flatMap(user -> {
                     App.setUser(user);
-                    return getDataLayer().getAccountService().getUserInfo(account);
+                    return getDataLayer().getAccountService()
+                            .getUserInfo(account);
                 })
                 .compose(RxTransformers.filterResultCD())
                 .compose(RxTransformers.applySchedulers())
@@ -53,7 +56,6 @@ public class LoginFragment extends BindingFragment<FragmentLoginBinding> {
                 .subscribe(user -> {
                     user.setLogged(true);
                     user.setName(user.getNick());
-                    user.setAvatar("http://ww4.sinaimg.cn/large/6af89bc8gw1f8npye09jyj20f00drmys.jpg");
                     App.setUser(user);
                     startWithPop(MainFragment.newInstance());
                 }, throwable -> {

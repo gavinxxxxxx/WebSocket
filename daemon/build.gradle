@@ -17,13 +17,13 @@ android {
         debug {
             minifyEnabled false
             buildConfigField "boolean", "LOG_DEBUG", "true"
-            buildConfigField "String", "TAG", "daemon"
+            buildConfigField "String", "TAG", "\"daemon\""
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
             minifyEnabled true
             buildConfigField "boolean", "LOG_DEBUG", "false"
-            buildConfigField "String", "TAG", "daemon"
+            buildConfigField "String", "TAG", "\"daemon\""
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

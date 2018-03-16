@@ -13,8 +13,9 @@ public class User extends Contact {
 
     @SerializedName("remark")
     private String sign;
-    private boolean logged;
+    @SerializedName("token")
     private String token;
+    private boolean logged;
 
     public String getSign() {
         return sign;
@@ -24,20 +25,20 @@ public class User extends Contact {
         this.sign = sign;
     }
 
-    public boolean isLogged() {
-        return logged;
-    }
-
-    public void setLogged(boolean logged) {
-        this.logged = logged;
-    }
-
     public String getToken() {
         return token;
     }
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public boolean isLogged() {
+        return logged;
+    }
+
+    public void setLogged(boolean logged) {
+        this.logged = logged;
     }
 
     @Override
