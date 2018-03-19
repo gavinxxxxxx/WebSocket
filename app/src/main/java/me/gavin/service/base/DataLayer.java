@@ -85,6 +85,8 @@ public class DataLayer {
         Observable<Result> updateName(String value);
 
         Observable<Result> updateSign(String value);
+
+        Observable<Result> logout();
     }
 
     public interface SettingService {

@@ -37,4 +37,9 @@ public class AccountManager extends BaseManager implements DataLayer.AccountServ
     public Observable<Result> updateSign(String value) {
         return getApi().updateSign(value);
     }
+
+    @Override
+    public Observable<Result> logout() {
+        return getApi().logout();
+    }
 }

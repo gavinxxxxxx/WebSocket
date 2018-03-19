@@ -115,10 +115,12 @@ public class IMService extends Service {
         if (mWebSocket != null) {
             mWebSocket.close(1000, "close by me");
         }
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            startService(new Intent(App.get(), IMService.class));
-        } else {
-            startForegroundService(new Intent(App.get(), IMService.class));
+        if (App.getUser() != null && App.getUser().isLogged()) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                startService(new Intent(App.get(), IMService.class));
+            } else {
+                startForegroundService(new Intent(App.get(), IMService.class));
+            }
         }
     }
 

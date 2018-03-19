@@ -10,6 +10,8 @@ import me.gavin.app.main.StartFragmentEvent;
 import me.gavin.base.App;
 import me.gavin.base.BindingFragment;
 import me.gavin.base.RxBus;
+import me.gavin.base.RxTransformers;
+import me.gavin.db.DBHelper;
 import me.gavin.im.ws.R;
 import me.gavin.im.ws.databinding.FragmentMineBinding;
 
@@ -39,11 +41,7 @@ public class MineFragment extends BindingFragment<FragmentMineBinding> {
         mBinding.flSignature.setOnClickListener(v ->
                 RxBus.get().post(new StartFragmentEvent(InputFragment.newInstance(InputFragment.TYPE_SIGN))));
 
-        mBinding.btnLogout.setOnClickListener(v -> {
-            getActivity().stopService(new Intent(getActivity(), IMService.class));
-            App.setUser(null);
-            _mActivity.finish();
-        });
+        mBinding.btnLogout.setOnClickListener(v -> logout());
 
         mBinding.btnDebug.setOnClickListener(v -> getDataLayer().getSettingService().debug());
     }
@@ -52,5 +50,21 @@ public class MineFragment extends BindingFragment<FragmentMineBinding> {
     public void onSupportVisible() {
         super.onSupportVisible();
         mBinding.setItem(App.getUser());
+    }
+
+    private void logout() {
+        getDataLayer().getAccountService()
+                .logout()
+                .compose(RxTransformers.applySchedulers())
+                .doOnSubscribe(mCompositeDisposable::add)
+                .subscribe(result -> exit(),
+                        throwable -> exit());
+    }
+
+    private void exit() {
+        App.setUser(null);
+        DBHelper.get().notifyDB();
+        getActivity().finish();
+        getActivity().stopService(new Intent(getActivity(), IMService.class));
     }
 }

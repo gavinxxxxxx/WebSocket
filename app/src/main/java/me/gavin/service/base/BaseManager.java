@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import javax.inject.Inject;
 
 import dagger.Lazy;
+import me.gavin.db.DBHelper;
 import me.gavin.db.dao.DaoSession;
 import me.gavin.inject.component.ApplicationComponent;
 import me.gavin.net.ClientAPI;
@@ -23,8 +24,6 @@ public abstract class BaseManager {
     @Inject
     Lazy<Gson> mGson;
     @Inject
-    Lazy<DaoSession> mDaoSession;
-    @Inject
     Lazy<SharedPreferences> mPreferences;
 
     public BaseManager() {
@@ -40,7 +39,7 @@ public abstract class BaseManager {
     }
 
     public DaoSession getDaoSession() {
-        return mDaoSession.get();
+        return DBHelper.get().getDaoSession();
     }
 
     public SharedPreferences getSharedPreferences() {

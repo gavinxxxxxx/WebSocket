@@ -4,12 +4,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 
-import java.net.HttpURLConnection;
-
 import me.gavin.app.main.MainFragment;
 import me.gavin.base.App;
 import me.gavin.base.BindingFragment;
 import me.gavin.base.RxTransformers;
+import me.gavin.db.DBHelper;
 import me.gavin.im.ws.R;
 import me.gavin.im.ws.databinding.FragmentLoginBinding;
 import me.gavin.util.MD5;
@@ -57,6 +56,7 @@ public class LoginFragment extends BindingFragment<FragmentLoginBinding> {
                     user.setLogged(true);
                     user.setName(user.getNick());
                     App.setUser(user);
+                    DBHelper.get().notifyDB();
                     startWithPop(MainFragment.newInstance());
                 }, throwable -> {
                     throwable.printStackTrace();
@@ -78,4 +78,5 @@ public class LoginFragment extends BindingFragment<FragmentLoginBinding> {
                             Snackbar.make(mBinding.btnRegister, throwable.toString(), Snackbar.LENGTH_LONG).show();
                         });
     }
+
 }

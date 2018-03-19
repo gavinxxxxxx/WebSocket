@@ -47,6 +47,9 @@ public interface ClientAPI {
     @PATCH("user/signature")
     Observable<Result> updateSign(@Query("signature") String value);
 
+    @GET("user/logout")
+    Observable<Result> logout();
+
 
     /* **************************************************************************** *
      * *********************************** 通讯录 ********************************** *
