@@ -17,4 +17,5 @@ public class BundleKey {
 
     public static final String QUERY = "query"; // 查询条件
 
+    public static final String MAIN_JUMP_TYPE = "mainJumpType"; // 主页跳转类型
 }

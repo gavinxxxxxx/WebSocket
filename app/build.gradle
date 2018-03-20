@@ -32,11 +32,11 @@ android {
             minifyEnabled false
             shrinkResources false
             zipAlignEnabled false
-            applicationIdSuffix ".debug"
+//            applicationIdSuffix ".debug"
             versionNameSuffix ".debug"
             buildConfigField "boolean", "LOG_DEBUG", "true"
             buildConfigField "boolean", "API_DEBUG", "true"
-            resValue "string", "app_name", "ws debug"
+            resValue "string", "app_name", "ws"
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }

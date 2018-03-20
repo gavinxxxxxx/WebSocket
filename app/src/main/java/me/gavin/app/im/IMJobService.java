@@ -29,7 +29,7 @@ public class IMJobService extends JobService {
     public void doSampleJob(JobParameters params) {
         // Do some heavy operation
         L.e("doSampleJob - " + params);
-        NotificationHelper.notify(this, "IMJobService", "doSampleJob", "doSampleJob", null);
+        NotificationHelper.notify(this, "IMJobService", "doSampleJob", "doSampleJob", null, null);
 
         // App.get().startService(new Intent(App.get(), IMService.class));// TODO: 2018/3/9 Not allowed to start service Intent
 

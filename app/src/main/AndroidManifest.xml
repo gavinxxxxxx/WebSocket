@@ -16,7 +16,9 @@
         android:theme="@style/AppTheme.NoActionBar"
         tools:replace="android:allowBackup">
 
-        <activity android:name="me.gavin.app.main.MainActivity">
+        <activity
+            android:name="me.gavin.app.main.MainActivity"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

@@ -1,8 +1,8 @@
 package me.gavin.app.im;
 
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
@@ -17,8 +17,10 @@ import dagger.Lazy;
 import io.reactivex.Observable;
 import io.reactivex.ObservableTransformer;
 import io.reactivex.disposables.CompositeDisposable;
+import me.gavin.app.main.MainActivity;
 import me.gavin.app.message.Message;
 import me.gavin.base.App;
+import me.gavin.base.BundleKey;
 import me.gavin.base.Config;
 import me.gavin.base.RxBus;
 import me.gavin.inject.component.ApplicationComponent;
@@ -65,7 +67,6 @@ public class IMService extends Service {
         super.onCreate();
         L.e("onCreate - " + System.currentTimeMillis() + " - " + this);
         ApplicationComponent.Instance.get().inject(this);
-        startForeground(-99, NotificationHelper.newNotificationBuilder(this).build());
     }
 
     @Override
@@ -80,7 +81,6 @@ public class IMService extends Service {
         mCompositeDisposable = new CompositeDisposable();
         createWebSocket();
         subscribe();
-        // return Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? START_STICKY : START_NOT_STICKY;
         return START_STICKY;
     }
 
@@ -116,11 +116,7 @@ public class IMService extends Service {
             mWebSocket.close(1000, "close by me");
         }
         if (App.getUser() != null && App.getUser().isLogged()) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                startService(new Intent(App.get(), IMService.class));
-            } else {
-                startForegroundService(new Intent(App.get(), IMService.class));
-            }
+            startService(new Intent(App.get(), IMService.class));
         }
     }
 
@@ -203,14 +199,26 @@ public class IMService extends Service {
                 mDataLayer.get().getMessageService().insert(msg);
                 RxBus.get().post(new ReceiveMsgEvent(msg));
 
+                PendingIntent intent = PendingIntent.getActivity(
+                        this,
+                        0,
+                        new Intent(this, MainActivity.class)
+                                .addCategory(Intent.CATEGORY_LAUNCHER)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                                        | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED) // 关键的一步，设置启动模式
+                                .putExtra(BundleKey.MAIN_JUMP_TYPE, 1)
+                                .putExtra(BundleKey.CHAT_TYPE, msg.getChatType())
+                                .putExtra(BundleKey.CHAT_ID, msg.getChatId()),
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+
                 mDataLayer.get().getContactService()
                         .getContact(msg.getSender())
                         .doOnSubscribe(mCompositeDisposable::add)
                         .subscribe(contact -> {
                             String name = contact.getNick() != null ? contact.getNick() : contact.getName();
-                            NotificationHelper.notify(App.get(), name, msg.getContent(), msg.getContent(), null);
+                            NotificationHelper.notify(App.get(), name, msg.getContent(), msg.getContent(), contact.getAvatar(), intent);
                         }, throwable -> {
-                            NotificationHelper.notify(App.get(), String.valueOf(msg.getSender()), msg.getContent(), msg.getContent(), null);
+                            NotificationHelper.notify(App.get(), String.valueOf(msg.getSender()), msg.getContent(), msg.getContent(), null, intent);
                         });
                 break;
             case "ADD_FRIEND":

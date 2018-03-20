@@ -87,6 +87,11 @@ public class ChatFragment extends BindingFragment<FragmentChatBinding> {
         });
     }
 
+//    @Override
+//    public void onNewBundle(Bundle args) {
+//        super.onNewBundle(args);
+//    }
+
     public void subscribeEvent() {
         RxBus.get().toObservable(ReceiveMsgEvent.class)
                 .map(event -> event.message)

@@ -1,5 +1,6 @@
 package me.gavin.app.main;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,8 +17,11 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import me.gavin.app.account.LoginFragment;
+import me.gavin.app.message.ChatFragment;
+import me.gavin.app.message.Message;
 import me.gavin.base.App;
 import me.gavin.base.BindingActivity;
+import me.gavin.base.BundleKey;
 import me.gavin.base.RxBus;
 import me.gavin.im.ws.R;
 import me.gavin.im.ws.databinding.ActivityMainBinding;
@@ -49,6 +53,14 @@ public class MainActivity extends BindingActivity<ActivityMainBinding>
         subscribeEvent();
         mBinding.navigation.setNavigationItemSelectedListener(this);
         mBinding.navigation.getMenu().findItem(R.id.nav_news).setChecked(true);
+
+
+        if (getIntent().getIntExtra(BundleKey.MAIN_JUMP_TYPE, 0) == 1) {
+            ChatFragment fragment = ChatFragment.newInstance(
+                    getIntent().getIntExtra(BundleKey.CHAT_TYPE, Message.CHAT_TYPE_SINGLE),
+                    getIntent().getLongExtra(BundleKey.CHAT_ID, 0L));
+            RxBus.get().post(new StartFragmentEvent(fragment));
+        }
     }
 
     @Override
@@ -76,6 +88,17 @@ public class MainActivity extends BindingActivity<ActivityMainBinding>
             mBinding.drawer.closeDrawer(Gravity.START);
         } else {
             super.onBackPressedSupport();
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent.getIntExtra(BundleKey.MAIN_JUMP_TYPE, 0) == 1) {
+            ChatFragment fragment = ChatFragment.newInstance(
+                    intent.getIntExtra(BundleKey.CHAT_TYPE, Message.CHAT_TYPE_SINGLE),
+                    intent.getLongExtra(BundleKey.CHAT_ID, 0L));
+            RxBus.get().post(new StartFragmentEvent(fragment));
         }
     }
 

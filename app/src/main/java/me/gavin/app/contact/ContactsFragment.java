@@ -42,6 +42,7 @@ public class ContactsFragment extends BindingFragment<LayoutRecyclerBinding> {
         mBinding.recycler.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener(i -> {
             ChatFragment fragment = ChatFragment.newInstance(Message.CHAT_TYPE_SINGLE, mContacts.get(i).getId());
+            // ((SupportActivity)getActivity()).start(fragment, ISupportFragment.SINGLETASK);
             RxBus.get().post(new StartFragmentEvent(fragment));
         });
 

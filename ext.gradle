@@ -27,10 +27,10 @@ def static autoVersionName() {
 
 ext {
     applicationId = "me.gavin.im.ws"
-    compileSdkVersion = 27
+    compileSdkVersion = 25
     buildToolsVersion = "27.0.3"
     minSdkVersion = 21
-    targetSdkVersion = 27
+    targetSdkVersion = 25
     versionCode = autoVersionCode()
     versionName = autoVersionName()
     resConfigs = "zh" // 只保留中文
