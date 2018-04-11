@@ -147,11 +147,10 @@ public class IMService extends Service {
                         .build(), new MyWebSocketListener());
 
 //        toObservable()
-////                .compose(retryWhen())
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .doOnSubscribe(d -> {
-//                    mCompositeDisposable.add(d);
+//                .compose(RxTransformers.applySchedulers())
+//                .compose(retryAndRepeat())
+//                .doOnSubscribe(disposable -> {
+//                    mCompositeDisposable.add(disposable);
 //                    Request request = new Request.Builder().url(Config.WS_URL).build();
 //                    mWebSocket = mOkHttpClient.get().newWebSocket(request, mListener.get());
 //                })
@@ -168,15 +167,22 @@ public class IMService extends Service {
 
     /**
      * 断线重连
+     * 1: 重连3次 指数退避
+     * 2: 结束和出错3s重连
      */
-    public <T> ObservableTransformer<T, T> retryWhen() {
+    public <T> ObservableTransformer<T, T> retryAndRepeat() {
         return upstream -> upstream
                 .retryWhen(throwableObservable -> throwableObservable
-                        .delay(1, TimeUnit.SECONDS)
-                        .map(t -> 0))
+                        .zipWith(Observable.range(0, 3), (t, i) -> i) // 重试3次
+                        .flatMap(retryCount -> Observable.timer((long) Math.pow(5, retryCount), TimeUnit.SECONDS))) // 指数退避
                 .repeatWhen(objectObservable -> objectObservable
-                        .delay(1, TimeUnit.SECONDS)
-                        .map(o -> 0));
+                        .zipWith(Observable.range(0, 3), (o, i) -> i)
+                        .flatMap(retryCount -> Observable.timer((long) Math.pow(5, retryCount), TimeUnit.SECONDS))); // 指数退避
+//        return upstream -> upstream
+//                .retryWhen(throwableObservable -> throwableObservable
+//                        .flatMap(t -> Observable.timer(3, TimeUnit.SECONDS)))
+//                .repeatWhen(objectObservable -> objectObservable
+//                        .delay(3, TimeUnit.SECONDS));
     }
 
     private Observable<String> toObservable() {

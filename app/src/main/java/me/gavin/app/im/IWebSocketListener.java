@@ -16,15 +16,15 @@ public class IWebSocketListener extends WebSocketListener {
 
     private static final String TAG = "WebSocket";
 
-    private Observable<String> observable;
+//    private Observable<String> observable;
     private Emitter<String> emitter;
 
-    public IWebSocketListener() {
-        observable = Observable.create(observableEmitter -> emitter = observableEmitter);
-    }
+//    public IWebSocketListener() {
+//        observable = Observable.create(observableEmitter -> emitter = observableEmitter);
+//    }
 
     public Observable<String> getObservable() {
-        return observable;
+        return Observable.create(observableEmitter -> emitter = observableEmitter);
     }
 
     @Override
