@@ -8,6 +8,8 @@ import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 
+import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -17,21 +19,22 @@ import dagger.Lazy;
 import io.reactivex.Observable;
 import io.reactivex.ObservableTransformer;
 import io.reactivex.disposables.CompositeDisposable;
+import me.gavin.app.im.event.ReceiveMsgEvent;
+import me.gavin.app.im.event.SendMsgEvent;
 import me.gavin.app.main.MainActivity;
 import me.gavin.app.message.Message;
 import me.gavin.base.App;
 import me.gavin.base.BundleKey;
 import me.gavin.base.Config;
 import me.gavin.base.RxBus;
+import me.gavin.base.RxTransformers;
 import me.gavin.inject.component.ApplicationComponent;
 import me.gavin.service.base.DataLayer;
 import me.gavin.util.L;
 import me.gavin.util.NotificationHelper;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
 
 /**
  * 消息服务 - 收发消息
@@ -85,16 +88,6 @@ public class IMService extends Service {
     }
 
     @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-    }
-
-    @Override
-    public void onTrimMemory(int level) {
-        super.onTrimMemory(level);
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
         L.e("onDestroy - " + System.currentTimeMillis() + " - " + this);
@@ -126,12 +119,12 @@ public class IMService extends Service {
                 .doOnSubscribe(mCompositeDisposable::add)
                 .subscribe(msg -> {
                     String content = mGson.get().toJson(msg);
-                    TTT ttt = new TTT();
-                    ttt.setType("MSG");
-                    ttt.setContent(content);
-                    ttt.setTo(msg.getChatId());
-                    ttt.setFrom(msg.getSender());
-                    String json = mGson.get().toJson(ttt);
+                    IMessage im = new IMessage();
+                    im.setType("MSG");
+                    im.setContent(content);
+                    im.setTo(msg.getChatId());
+                    im.setFrom(msg.getSender());
+                    String json = mGson.get().toJson(im);
                     boolean result = mWebSocket.send(json);
                     L.d(TAG, "onSend - " + result + " - " + json);
                 });
@@ -141,28 +134,29 @@ public class IMService extends Service {
         if (App.getUser() == null || !App.getUser().isLogged()) {
             return;
         }
-        mWebSocket = mOkHttpClient.get()
-                .newWebSocket(new Request.Builder()
-                        .url(Config.WS_URL)
-                        .build(), new MyWebSocketListener());
+        toObservable()
+                .compose(RxTransformers.applySchedulers())
+                .compose(retryAndRepeat())
+                .doOnSubscribe(mCompositeDisposable::add)
+                .subscribe(s -> {
+                    L.e("onNext - " + s);
+                    handleMessage(s);
+                }, throwable -> {
+                    L.e("onError - " + throwable);
+                    throwable.printStackTrace();
+                }, () -> {
+                    L.e("onComplete - ");
+                });
+    }
 
-//        toObservable()
-//                .compose(RxTransformers.applySchedulers())
-//                .compose(retryAndRepeat())
-//                .doOnSubscribe(disposable -> {
-//                    mCompositeDisposable.add(disposable);
-//                    Request request = new Request.Builder().url(Config.WS_URL).build();
-//                    mWebSocket = mOkHttpClient.get().newWebSocket(request, mListener.get());
-//                })
-//                .subscribe(s -> {
-//                    L.e("onNext - " + s);
-//                    handleMessage(s);
-//                }, throwable -> {
-//                    L.e("onError - " + throwable);
-//                    throwable.printStackTrace();
-//                }, () -> {
-//                    L.e("onComplete - ");
-//                });
+    private Observable<String> toObservable() {
+        L.e("toObservable - " + System.currentTimeMillis());
+        return Observable.defer(() -> {
+            L.e(String.format(Locale.getDefault(), "defer - %tT", new Date()));
+            Request request = new Request.Builder().url(Config.WS_URL).build();
+            mWebSocket = mOkHttpClient.get().newWebSocket(request, mListener.get());
+            return mListener.get();
+        });
     }
 
     /**
@@ -173,30 +167,21 @@ public class IMService extends Service {
     public <T> ObservableTransformer<T, T> retryAndRepeat() {
         return upstream -> upstream
                 .retryWhen(throwableObservable -> throwableObservable
-                        .zipWith(Observable.range(0, 3), (t, i) -> i) // 重试3次
-                        .flatMap(retryCount -> Observable.timer((long) Math.pow(5, retryCount), TimeUnit.SECONDS))) // 指数退避
-                .repeatWhen(objectObservable -> objectObservable
-                        .zipWith(Observable.range(0, 3), (o, i) -> i)
-                        .flatMap(retryCount -> Observable.timer((long) Math.pow(5, retryCount), TimeUnit.SECONDS))); // 指数退避
+                        .flatMap(t -> Observable.timer(5, TimeUnit.SECONDS)));
 //        return upstream -> upstream
 //                .retryWhen(throwableObservable -> throwableObservable
-//                        .flatMap(t -> Observable.timer(3, TimeUnit.SECONDS)))
+//                        .zipWith(Observable.range(0, 3), (t, i) -> i) // 重试3次
+//                        .flatMap(retryCount -> Observable.timer((long) Math.pow(3, retryCount), TimeUnit.SECONDS))) // 指数退避
 //                .repeatWhen(objectObservable -> objectObservable
-//                        .delay(3, TimeUnit.SECONDS));
-    }
-
-    private Observable<String> toObservable() {
-        L.e("toObservable - " + System.currentTimeMillis());
-        return Observable.defer(() -> {
-            return mListener.get().getObservable();
-        });
+//                        .zipWith(Observable.range(0, 3), (o, i) -> i)
+//                        .flatMap(retryCount -> Observable.timer((long) Math.pow(5, retryCount), TimeUnit.SECONDS))); // 指数退避
     }
 
     public void handleMessage(String text) {
-        TTT ttt = mGson.get().fromJson(text, TTT.class);
-        switch (ttt.getType()) {
+        IMessage IMessage = mGson.get().fromJson(text, IMessage.class);
+        switch (IMessage.getType()) {
             case "MSG":
-                Message msg = mGson.get().fromJson(ttt.getContent(), Message.class);
+                Message msg = mGson.get().fromJson(IMessage.getContent(), Message.class);
                 if (msg.getChatType() == Message.CHAT_TYPE_SINGLE
                         && msg.getSender() == msg.getChatId()) { // 自己发的单聊消息不接收
                     return;
@@ -219,6 +204,7 @@ public class IMService extends Service {
 
                 mDataLayer.get().getContactService()
                         .getContact(msg.getSender())
+                        .compose(RxTransformers.applySchedulers())
                         .doOnSubscribe(mCompositeDisposable::add)
                         .subscribe(contact -> {
                             String name = contact.getNick() != null ? contact.getNick() : contact.getName();
@@ -228,45 +214,20 @@ public class IMService extends Service {
                         });
                 break;
             case "ADD_FRIEND":
-                me.gavin.app.contact.Request req = mGson.get().fromJson(ttt.getContent(), me.gavin.app.contact.Request.class);
-                req.setUid(ttt.getFrom());
+                me.gavin.app.contact.Request req = mGson.get().fromJson(IMessage.getContent(), me.gavin.app.contact.Request.class);
+                req.setUid(IMessage.getFrom());
                 mDataLayer.get().getContactService().insetRequest(req);
 
                 long time = System.currentTimeMillis();
                 Message reqMsg = new Message();
-                reqMsg.setId(ttt.getFrom() + "" + time);
+                reqMsg.setId(IMessage.getFrom() + "" + time);
                 reqMsg.setContent(String.format("%s 请求加为好友", req.getName()));
                 reqMsg.setTime(time);
-                reqMsg.setSender(ttt.getFrom());
+                reqMsg.setSender(IMessage.getFrom());
                 reqMsg.setChatType(Message.CHAT_TYPE_SYSTEM);
                 reqMsg.setChatId(Message.SYSTEM_CONTACT_REQUEST);
                 mDataLayer.get().getMessageService().insert(reqMsg);
                 break;
-        }
-    }
-
-    private class MyWebSocketListener extends WebSocketListener {
-        @Override
-        public void onOpen(WebSocket webSocket, Response response) {
-            L.e(TAG, "onOpen - " + response);
-        }
-
-        @Override
-        public void onMessage(WebSocket webSocket, String text) {
-            L.d(TAG, "onMessage - " + text);
-            handleMessage(text);
-        }
-
-        @Override
-        public void onClosed(WebSocket webSocket, int code, String reason) {
-            L.e(TAG, "onClosed - " + code + " - " + reason + " - ");
-            createWebSocket();
-        }
-
-        @Override
-        public void onFailure(WebSocket webSocket, Throwable t, @Nullable Response response) {
-            L.e(TAG, "onFailure - " + t);
-            createWebSocket();
         }
     }
 }

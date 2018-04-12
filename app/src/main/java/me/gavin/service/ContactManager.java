@@ -53,15 +53,14 @@ public class ContactManager extends BaseManager implements DataLayer.ContactServ
 
     @Override
     public Observable<Contact> getContact(long id) {
-        List<Contact> list = getDaoSession().getContactDao()
+        Contact contact = getDaoSession().getContactDao()
                 .queryBuilder()
                 .where(ContactDao.Properties.Id.eq(id))
-                .limit(1)
-                .list();
-        if (list == null || list.isEmpty()) {
+                .unique();
+        if (contact == null) {
             return Observable.error(new NullPointerException("获取用户信息错误 - 用户不存在"));
         }
-        return Observable.just(list.get(0));
+        return Observable.just(contact);
     }
 
     @Override

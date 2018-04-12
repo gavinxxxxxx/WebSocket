@@ -11,7 +11,10 @@ import android.support.v4.app.NotificationManagerCompat;
 import com.bumptech.glide.Glide;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
+import me.gavin.base.App;
 import me.gavin.im.ws.R;
 
 /**
@@ -33,7 +36,7 @@ public final class NotificationHelper {
     private static Notification buildNotification(Context cx, String tt, String cn, String tk, String av, PendingIntent i) {
         Notification.Builder builder = new Notification.Builder(cx)
                 .setSmallIcon(R.drawable.vt_daily)
-                .setLargeIcon(getBitmap(cx, av))
+                // .setLargeIcon(getBitmap(cx, av))
                 .setContentTitle(tt)
                 .setContentText(cn)
                 .setTicker(tk)
@@ -54,13 +57,13 @@ public final class NotificationHelper {
      */
     private static Bitmap getBitmap(Context context, String url) {
         try {
-            return Glide.with(context)
+            return Glide.with(App.get())
                     .load(url)
                     .asBitmap()
                     .into(60, 60)
-                    .get();
-        } catch (InterruptedException | ExecutionException e) {
-            return BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
+                    .get(2000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            return BitmapFactory.decodeResource(App.get().getResources(), R.mipmap.ic_launcher);
         }
     }
 }

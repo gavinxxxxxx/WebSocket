@@ -5,7 +5,7 @@ package me.gavin.app.im;
  *
  * @author gavin.xiong 2018/3/1
  */
-public class TTT {
+public class IMessage {
 
     private String type;
     private String content;

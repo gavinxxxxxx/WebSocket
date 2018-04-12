@@ -1,4 +1,4 @@
-package me.gavin.app.im;
+package me.gavin.app.im.event;
 
 import me.gavin.app.message.Message;
 
@@ -7,11 +7,11 @@ import me.gavin.app.message.Message;
  *
  * @author gavin.xiong 2018/3/1
  */
-public class SendMsgEvent {
+public class ReceiveMsgEvent {
 
     public Message message;
 
-    public SendMsgEvent(Message message) {
+    public ReceiveMsgEvent(Message message) {
         this.message = message;
     }
 }

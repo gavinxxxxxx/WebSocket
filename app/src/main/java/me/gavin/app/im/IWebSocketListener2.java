@@ -1,7 +1,8 @@
 package me.gavin.app.im;
 
-import io.reactivex.ObservableSource;
-import io.reactivex.Observer;
+import io.reactivex.Emitter;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import me.gavin.util.L;
 import okhttp3.Response;
 import okhttp3.WebSocket;
@@ -12,15 +13,15 @@ import okhttp3.WebSocketListener;
  *
  * @author gavin.xiong 2018/3/8
  */
-public class IWebSocketListener extends WebSocketListener implements ObservableSource<String> {
+public class IWebSocketListener2 extends WebSocketListener implements ObservableOnSubscribe<String> {
 
     private static final String TAG = "WebSocket";
 
-    private Observer<? super String> mObserver;
+    private Emitter<? super String> mEmitter;
 
     @Override
-    public void subscribe(Observer<? super String> observer) {
-        this.mObserver = observer;
+    public void subscribe(ObservableEmitter<String> emitter) throws Exception {
+        mEmitter = emitter;
     }
 
     @Override
@@ -31,18 +32,18 @@ public class IWebSocketListener extends WebSocketListener implements ObservableS
     @Override
     public void onMessage(WebSocket webSocket, String text) {
         L.d(TAG, "onMessage - " + text);
-        mObserver.onNext(text);
+        mEmitter.onNext(text);
     }
 
     @Override
     public void onClosed(WebSocket webSocket, int code, String reason) {
         L.e(TAG, "onClosed - " + code + " - " + reason + " - ");
-        mObserver.onComplete();
+        mEmitter.onComplete();
     }
 
     @Override
     public void onFailure(WebSocket webSocket, Throwable t, Response response) {
         L.e(TAG, "onFailure - " + t);
-        mObserver.onError(t);
+        mEmitter.onError(t);
     }
 }

@@ -12,8 +12,8 @@ import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import me.gavin.app.contact.Contact;
-import me.gavin.app.im.ReceiveMsgEvent;
-import me.gavin.app.im.SendMsgEvent;
+import me.gavin.app.im.event.ReceiveMsgEvent;
+import me.gavin.app.im.event.SendMsgEvent;
 import me.gavin.base.App;
 import me.gavin.base.BindingFragment;
 import me.gavin.base.BundleKey;

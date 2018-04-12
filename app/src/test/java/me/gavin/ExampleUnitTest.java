@@ -1,7 +1,5 @@
 package me.gavin;
 
-import com.google.gson.Gson;
-
 import org.junit.Test;
 
 import java.lang.ref.WeakReference;
@@ -148,35 +146,5 @@ public class ExampleUnitTest {
 
         String ss = String.format(Locale.getDefault(), "%1$tY.%1$tm.%1$td  %1$tR至%2$tR", date, date);
         System.out.println(ss);
-    }
-
-    @Test
-    public void parse() {
-        String json = "{m:{key:4456456466}}";
-        Response model = new Gson().fromJson(json, Response.class);
-        System.out.println(model);
-    }
-
-    public static class Response {
-        private Model m;
-
-        @Override
-        public String toString() {
-            return "Response{" +
-                    "m=" + m +
-                    '}';
-        }
-    }
-
-    public static class Model {
-
-        private Object key;
-
-        @Override
-        public String toString() {
-            return "Model{" +
-                    "key=" + key +
-                    '}';
-        }
     }
 }
