@@ -8,8 +8,6 @@ import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 
-import java.util.Date;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -150,9 +148,7 @@ public class IMService extends Service {
     }
 
     private Observable<String> toObservable() {
-        L.e("toObservable - " + System.currentTimeMillis());
         return Observable.defer(() -> {
-            L.e(String.format(Locale.getDefault(), "defer - %tT", new Date()));
             Request request = new Request.Builder().url(Config.WS_URL).build();
             mWebSocket = mOkHttpClient.get().newWebSocket(request, mListener.get());
             return mListener.get();
