@@ -33,11 +33,11 @@ public class MainFragment extends BindingFragment<FragmentMainBinding> {
 
     @Override
     protected void afterCreate(@Nullable Bundle savedInstanceState) {
-//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             App.get().startService(new Intent(App.get(), IMService.class));
-//        } else {
-//            App.get().startForegroundService(new Intent(App.get(), IMService.class));
-//        }
+        } else {
+            App.get().startForegroundService(new Intent(App.get(), IMService.class));
+        }
 
 //        ComponentName serviceName = new ComponentName(getContext(), IMJobService.class);
 //        JobInfo.Builder builder = new JobInfo.Builder(0x253, serviceName);

@@ -1,4 +1,4 @@
-def supportVersion = "26.0.0-alpha1"
+def supportVersion = "27.1.0"
 
 def fragmentationVersion = "1.1.0"
 def rxJavaVersion = "2.1.2"
@@ -27,10 +27,10 @@ def static autoVersionName() {
 
 ext {
     applicationId = "me.gavin.im.ws"
-    compileSdkVersion = 25
+    compileSdkVersion = 27
     buildToolsVersion = "27.0.3"
     minSdkVersion = 21
-    targetSdkVersion = 25
+    targetSdkVersion = 27
     versionCode = autoVersionCode()
     versionName = autoVersionName()
     resConfigs = "zh" // 只保留中文

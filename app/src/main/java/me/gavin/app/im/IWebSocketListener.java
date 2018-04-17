@@ -37,7 +37,7 @@ public class IWebSocketListener extends WebSocketListener implements ObservableS
     @Override
     public void onClosed(WebSocket webSocket, int code, String reason) {
         L.e(TAG, "onClosed - " + code + " - " + reason + " - ");
-        mObserver.onComplete();
+        // mObserver.onComplete();
     }
 
     @Override

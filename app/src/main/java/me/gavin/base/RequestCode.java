@@ -7,6 +7,10 @@ package me.gavin.base;
  */
 public class RequestCode {
     /**
+     * ╮(╯▽╰)╭
+     */
+    public static final int DONT_CARE = 0X100;
+    /**
      * 拍照
      */
     public static final int TAKE_PHOTO = 0X101;

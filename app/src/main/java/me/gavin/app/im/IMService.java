@@ -8,6 +8,8 @@ import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -57,6 +59,8 @@ public class IMService extends Service {
 
     private WebSocket mWebSocket;
 
+    private final Queue<IMessage> mMessageQueue = new LinkedList<>();
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -67,17 +71,18 @@ public class IMService extends Service {
     public void onCreate() {
         super.onCreate();
         L.e("onCreate - " + System.currentTimeMillis() + " - " + this);
+        startForeground(0x250, NotificationHelper.newBackgroundNotification(this));
         ApplicationComponent.Instance.get().inject(this);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         L.e("onStartCommand - " + System.currentTimeMillis() + " - " + this);
-        if (mCompositeDisposable != null) {
-            mCompositeDisposable.dispose();
-        }
         if (mWebSocket != null) {
             mWebSocket.close(1000, "close by me");
+        }
+        if (mCompositeDisposable != null) {
+            mCompositeDisposable.dispose();
         }
         mCompositeDisposable = new CompositeDisposable();
         createWebSocket();
@@ -100,11 +105,11 @@ public class IMService extends Service {
     }
 
     private void dispose() {
-        if (mCompositeDisposable != null) {
-            mCompositeDisposable.dispose();
-        }
         if (mWebSocket != null) {
             mWebSocket.close(1000, "close by me");
+        }
+        if (mCompositeDisposable != null) {
+            mCompositeDisposable.dispose();
         }
         if (App.getUser() != null && App.getUser().isLogged()) {
             startService(new Intent(App.get(), IMService.class));
@@ -164,6 +169,7 @@ public class IMService extends Service {
         return upstream -> upstream
                 .retryWhen(throwableObservable -> throwableObservable
                         .flatMap(t -> Observable.timer(5, TimeUnit.SECONDS)));
+//                .repeatWhen(objectObservable -> objectObservable.delay(5, TimeUnit.SECONDS));
 //        return upstream -> upstream
 //                .retryWhen(throwableObservable -> throwableObservable
 //                        .zipWith(Observable.range(0, 3), (t, i) -> i) // 重试3次
